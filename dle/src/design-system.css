@@ -1,0 +1,215 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root {
+  /* Primitive colors */
+  --color-brand: #710505;
+  --color-brand-dark: #7f1d1d;
+  --color-brand-soft: #5c2c2c;
+  --color-accent: #c5a880;
+
+  --color-background: #ffffff;
+  --color-background-warm: #faf6f0;
+  --color-surface-subtle: #f5f5f5;
+
+  --color-text: #2b2b2b;
+  --color-text-strong: #111827;
+  --color-text-muted: #6e6864;
+  --color-text-disabled: #71717a;
+  --color-text-inverse: #ffffff;
+
+  --color-border: #e5e7eb;
+  --color-border-warm: #d5bbbb;
+  --color-border-brand: #c5a880;
+
+  --color-success: #059669;
+  --color-success-surface: #d1fae5;
+  --color-danger: #bd2915;
+  --color-danger-surface: #ffc7c2;
+
+  /* Primitive typography */
+  --font-primary: 'Poppins', sans-serif;
+  --font-ui: 'Inter', sans-serif;
+  --font-decorative: 'Smooch', cursive;
+
+  --font-size-h1: 61px;
+  --line-height-h1: 1.2;
+  --font-size-h2: 49px;
+  --line-height-h2: 1.15;
+  --font-size-h3: 39px;
+  --line-height-h3: 1.2;
+  --font-size-h4: 31px;
+  --line-height-h4: 1.25;
+  --font-size-h5: 25px;
+  --line-height-h5: 1.3;
+  --font-size-h6: 20px;
+  --line-height-h6: 1.4;
+  --font-size-base: 16px;
+  --line-height-base: 1.5;
+  --font-size-small: 13px;
+  --line-height-small: 1.5;
+  --font-size-very-small: 10px;
+  --line-height-very-small: 1.4;
+
+
+
+  /* Primitive font weights */
+  --font-weight-thin: 100;
+  --font-weight-extra-light: 200;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extra-bold: 800;
+  --font-weight-black: 900;
+
+  /* Primitive spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-30: 120px;
+
+  /* Primitive border radii */
+  --radius-sm: 5px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* Semantic aliases */
+  --background: var(--color-background);
+  --foreground: var(--color-text);
+  --primary: var(--color-brand);
+  --primary-foreground: var(--color-text-inverse);
+  --muted: var(--color-surface-subtle);
+  --muted-foreground: var(--color-text-muted);
+  --border: var(--color-border);
+  --success: var(--color-success);
+  --success-foreground: var(--color-text-inverse);
+  --destructive: var(--color-danger);
+  --destructive-foreground: var(--color-text-inverse);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--foreground);
+  background: var(--background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  letter-spacing: -0.01em;
+}
+
+/* Reusable type scale */
+.type-h1,
+.type-h2,
+.type-h3,
+.type-h4,
+.type-h5,
+.type-h6 {
+  margin: 0;
+  font-family: var(--font-primary);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+}
+
+.type-h1 {
+  font-size: var(--font-size-h1);
+  line-height: var(--line-height-h1);
+}
+
+.type-h2 {
+  font-size: var(--font-size-h2);
+  line-height: var(--line-height-h2);
+}
+
+.type-h3 {
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+}
+
+.type-h4 {
+  font-size: var(--font-size-h4);
+  line-height: var(--line-height-h4);
+}
+
+.type-h5 {
+  font-size: var(--font-size-h5);
+  line-height: var(--line-height-h5);
+}
+
+.type-h6 {
+  font-size: var(--font-size-h6);
+  line-height: var(--line-height-h6);
+}
+
+.type-base {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  letter-spacing: normal;
+}
+
+.type-small {
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.type-very-small {
+  font-size: var(--font-size-very-small);
+  line-height: var(--line-height-very-small);
+}
+
+/* Font-weight utilities */
+.font-thin { font-weight: 100; }
+.font-extra-light { font-weight: 200; }
+.font-light { font-weight: 300; }
+.font-regular { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-extra-bold { font-weight: 800; }
+.font-black { font-weight: 900; }
+
+/* Accent font is intentionally reserved for decorative details. */
+.font-accent {
+  font-family: var(--font-decorative);
+}
+
+/* Semantic action and surface helpers */
+.button-primary {
+  color: var(--primary-foreground);
+  background-color: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-full);
+}
+
+.accent-decoration {
+  color: var(--color-accent);
+}
+
+.surface-warm {
+  background-color: var(--color-background-warm);
+}
