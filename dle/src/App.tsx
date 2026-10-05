@@ -1,13 +1,10 @@
-import logo from './logo.svg';
 import './App.css';
-import Navbar from './components/navbar/Navbar';
+import Homepage from './pages/home/Homepage';
 
 function Applive() {
   return (
     <div className="App">
-      <header className="App-header">
-      <Navbar type="authenticated"/>
-      </header>
+      <Homepage/>
     </div>
   );
 }
