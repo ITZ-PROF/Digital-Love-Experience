@@ -1,0 +1,92 @@
+.hero-section {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 70px;
+  overflow-x: hidden; /* Prevents 3D elements from creating horizontal scrollbars */
+  width: 100%;
+}
+
+.tagline {
+  background-color: var(--primary);
+  padding: 12px 20px;
+  border-radius: var(--radius-full);
+  color: var(--color-text-inverse);
+}
+
+.tagline-text {
+  margin: 0;
+  font-size: var(--font-size-small);
+
+}
+
+.hero-content {
+  text-align: center;
+  margin-top: -30px;
+  width: 100%;
+  min-height: 20vh;
+}
+
+.hero-title {
+  font-size: var(--font-size-h1);
+  color: var(--color-text);
+  margin-bottom: 10px;
+  line-height: 1;
+  letter-spacing: -5px;
+}
+
+.hero-description {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  margin: 0 auto 30px auto;
+}
+
+/* --- Full-Screen Panorama Slider Styling --- */
+
+.panorama-container {
+  width: 100vw; /* Take up absolute full screen viewport width */
+  height: 250px;
+  position: relative;
+  cursor: grab;
+  /* Balanced perspective setting to achieve the exact curvature curvature of the image */
+  perspective: 2000px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.panorama-container:active {
+  cursor: grabbing;
+}
+
+.panorama-carousel {
+  width: 100%;
+  height: 50%;
+  position: absolute;
+  transform-style: preserve-3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease-out; /* Keeps dragging responsive but silky smooth */
+}
+
+.panorama-item {
+  position: absolute;
+  /* Aspect ratios match the individual frames in the design reference */
+  width: 360px; 
+  height: 400px; 
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  user-select: none;
+}
+
+.panorama-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+}
