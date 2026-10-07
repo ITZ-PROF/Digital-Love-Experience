@@ -6,7 +6,6 @@
   justify-content: flex-start;
   width: 100%;
   background-color: var(--primary);
-  margin-bottom: 200px;
 }
 
 .display-content {
@@ -37,5 +36,4 @@
 }
 
 .display-phone {
-  margin-bottom: -180px;
 }
