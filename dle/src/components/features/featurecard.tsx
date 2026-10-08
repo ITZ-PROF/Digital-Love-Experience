@@ -1,20 +1,24 @@
+import { ReactNode, CSSProperties } from 'react';
 import './featuressection.css';
 
 
 interface FeatureCardProps {
-  title?: string;
-  description?: string;
-  imageUrl?: string;
+  title?: ReactNode
+  description?: ReactNode;
+  imageUrl?: ReactNode;
+  cardStyle?: string;
+  imgStyles? : CSSProperties
 }
 
-function FeatureCard({ title, description, imageUrl }: FeatureCardProps) {
+function FeatureCard({ title, description, imageUrl, imgStyles }: FeatureCardProps) {
     return (
-        <div className="feature-card">
-            <p className="feature-card-text">{title}</p>
-            <p className="feature-card-description">{description}</p>
+        <div className="feature-card" style={imgStyles}>
+            
             <div className="feature-card-image-container">
-                <img src={imageUrl} alt={title} className="feature-card-image" />
+                {imageUrl}
             </div>
+           {title}
+           {description}
         </div>
     );
 }
