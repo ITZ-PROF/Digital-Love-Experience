@@ -1,0 +1,23 @@
+.quote-container{
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 115.5px;
+    
+}
+
+* p {
+    text-align: center;
+}
+
+
+.quote-container p:first-of-type {
+    font-size: var(--font-size-h4);
+}
+.quote-container p:last-of-type {
+    font-size: var(--font-size-h6);
+    color: var(--primary);
+}
+
