@@ -2,6 +2,7 @@ import Navbar from "../../components/navbar/Navbar";
 import HeroSection from "../../components/hero/HeroSection";
 import DisplaySection from "../../components/display/displaysection";
 import Features from "../../components/features/featuressection";
+import Quote from "../../components/quote/quotesection";
 import './homepage.css';
 
 function Homepage() {
@@ -11,6 +12,7 @@ function Homepage() {
             <HeroSection />
             <DisplaySection />
             <Features />
+            <Quote/>
         </div>
     );
 }
