@@ -3,6 +3,7 @@ import HeroSection from "../../components/hero/HeroSection";
 import DisplaySection from "../../components/display/displaysection";
 import Features from "../../components/features/featuressection";
 import Quote from "../../components/quote/quotesection";
+import CTA from "../../components/cta/ctasection";
 import './homepage.css';
 
 function Homepage() {
@@ -13,6 +14,7 @@ function Homepage() {
             <DisplaySection />
             <Features />
             <Quote/>
+            <CTA/>
         </div>
     );
 }
