@@ -1,0 +1,16 @@
+.icon-list{
+    list-style-type: none;
+    display: flex;
+    flex-direction: row;
+    gap: 10px
+}
+
+
+.lower-footer-section{
+    display:flex;
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: 20%;
+}
