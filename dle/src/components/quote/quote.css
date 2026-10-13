@@ -1,10 +1,10 @@
 .quote-container{
-    height: 60vh;
+    height: 45vh;
     display: flex;
     align-items: center;
     flex-direction: column;
     width: 100%;
-    margin-top: 115.5px;
+    margin-top: 35.5px;
     
 }
 
