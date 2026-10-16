@@ -1,42 +1,43 @@
-.navbar{
+/* ==========================================================================
+   Base Styles (Desktop Layout)
+   ========================================================================== */
+.navbar {
     display: flex;
-    justify-content: Center;
+    justify-content: space-between; /* Changed from Center to cleanly separate logo and links */
     align-items: center;
     padding-left: 124px;
     padding-right: 124px;
     width: 100%;
-    height:60px;
+    height: 60px;
     position: fixed;
     top: 0;
     left: 0;
     z-index: 1000;
     background-color: #ffffff;
-    
+    box-sizing: border-box; /* Ensures padding does not break width calculations */
 }
 
-.navbar-links{
+.navbar-links {
     display: flex;
     gap: 20px;
     align-items: center;
-    width: 538px;
-    margin-left: 20px;
+    /* Removed: hardcoded 538px width to allow fluid flexibility */
 }
 
-.navbar-logo{
+.navbar-logo {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-right: 124px;
+    /* Removed: hardcoded 124px right margin */
 }
 
-
-.navbar-logo-text{
+.navbar-logo-text {
     color: var(--color-text);
     font-weight: var(--font-weight-semibold);
     font-size: var(--font-size-h3);
 }
 
-.btn-primary{
+.btn-primary {
     background-color: var(--primary);
     color: var(--color-text-accent);
     border: none;
@@ -48,9 +49,10 @@
     letter-spacing: normal;
     font-family: var(--font-primary);
     transition: opacity 0.3s ease;
+    white-space: nowrap; /* Prevents button text from breaking onto two lines */
 }
 
-.navbar-links a{
+.navbar-links a {
     text-decoration: none;
     color: var(--primary);
     font-size: var(--font-size-base);
@@ -59,27 +61,98 @@
     font-family: var(--font-primary);
     opacity: 0.6;
     transition: opacity 0.3s ease;
+    white-space: nowrap;
 }
 
-.navbar-links a:hover{
+.navbar-links a:hover {
     opacity: 1;
 }
 
-
-.btn-primary:hover{
+.btn-primary:hover {
     opacity: 0.6;
 }
 
 .navbar-profile {
     display: flex;
     align-items: center;
-    padding: 20px;
+    padding: 10px; /* Reduced from 20px to prevent overflow in a 60px high navbar */
     background-color: var(--primary);
     border-radius: var(--radius-full);
     transition: opacity 0.3s ease;
 }
 
-
-.navbar-profile:hover{
+.navbar-profile:hover {
     opacity: 0.6;
+}
+
+/* ==========================================================================
+   Mobile & Tablet Responsive Breakpoint (Screens below 1024px)
+   ========================================================================== */
+@media (max-width: 1023px) {
+    .navbar {
+        padding-left: 24px;   /* Shrink extreme desktop gutters down for mobile screen space */
+        padding-right: 24px;
+    }
+
+    /* Convert horizontal list layout into an overlay vertical dropdown menu */
+    .navbar-links.mobile-menu {
+        display: none; /* Hidden by default until toggle click triggers state changes */
+        flex-direction: column;
+        align-items: stretch; /* Stretches inner buttons/links nicely */
+        position: absolute;
+        top: 60px; /* Positions perfectly flush beneath the 60px high navbar */
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        padding: 24px;
+        gap: 16px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+        box-sizing: border-box;
+    }
+
+    /* Active visibility state class triggered by React useState toggle hook */
+    .navbar-links.mobile-menu.show {
+        display: flex;
+    }
+
+    .navbar-links a,
+    .btn-primary {
+        width: 100%;
+        text-align: center;
+    }
+
+    .navbar-profile {
+        align-self: center; /* Keeps the profile badge centered instead of stretched */
+    }
+
+    /* Hamburger Menu Toggle Icon Container */
+    .navbar-toggle {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 24px;
+        height: 18px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .hamburger-bar {
+        width: 100%;
+        height: 2px;
+        background-color: var(--primary);
+        transition: all 0.3s ease;
+    }
+
+    /* Interactive CSS Transitions: Morphs three lines cleanly into an 'X' icon */
+    .navbar-toggle.open .hamburger-bar:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+    .navbar-toggle.open .hamburger-bar:nth-child(2) {
+        opacity: 0;
+    }
+    .navbar-toggle.open .hamburger-bar:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
 }
