@@ -110,7 +110,14 @@
         align-items: stretch; /* Stretches inner buttons/links nicely */
         position: absolute;
         top: 60px; /* Positions perfectly flush beneath the 60px high navbar */
+        
+        /* 
+           FIXED: Overriding the absolute desktop positioning choices 
+           so the container anchors to the left and stretches 100% wide.
+        */
         left: 0;
+        transform: none;
+        
         width: 100%;
         background-color: #ffffff;
         padding: 24px;
@@ -125,7 +132,7 @@
     }
 
     .navbar-links a,
-    .btn-primary {
+    .navbar .btn-primary {
         width: 100%;
         text-align: center;
     }
