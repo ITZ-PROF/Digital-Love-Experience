@@ -4,6 +4,7 @@ import DisplaySection from "../../components/display/displaysection";
 import Features from "../../components/features/featuressection";
 import Quote from "../../components/quote/quotesection";
 import CTA from "../../components/cta/ctasection";
+import Footer from "../../components/footer/footersection";
 import './homepage.css';
 
 function Homepage() {
@@ -15,6 +16,7 @@ function Homepage() {
             <Features />
             <Quote/>
             <CTA/>
+            <Footer/>
         </div>
     );
 }
