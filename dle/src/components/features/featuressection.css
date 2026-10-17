@@ -73,4 +73,61 @@
     margin-top: -60px;
 }
 
+/* ==========================================================================
+   APPENDED RESPONSIvE OVERRIDES (DO NOT ALTER THE RULES ABOVE)
+   ========================================================================== */
 
+@media (max-width: 1180px) and (min-width: 640px) {
+    .features {
+        height: auto; /* Overrides fixed 100vh so wrapped elements don't get clipped */
+        padding-bottom: 80px;
+    }
+
+    .features-cards {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+        max-width: 600px;
+        row-gap: 80px;
+      /* Limits overall width to contain exactly 2 cards per row */
+    }
+    .feature-card {
+        /* 
+           Forces a perfect 2-column structure by setting each card width 
+           to 50% minus half of the 20px gap spacing.
+        */
+        width: calc(50% - 10px); 
+        padding-right: 24px;
+        box-sizing: border-box; /* Ensures horizontal padding is inside the width calculation */
+        
+    }
+}
+
+/* --- Mobile Viewport Breakpoint --- */
+@media (max-width: 639px) {
+    .features {
+        height: auto; 
+        padding-bottom: 60px;
+    }
+
+    .features-text {
+        font-size: calc(var(--font-size-h2) * 0.7); /* Safely scales down title for phone screens */
+        letter-spacing: -1px;                       /* Relieves typography overlap */
+    }
+
+    .features-cards {
+        display: flex;
+        flex-direction: column; /* Forces cards into a true single vertical column stack */
+        align-items: center;
+        width: 100%;
+        row-gap: 80px;
+    }
+
+    .feature-card {
+        width: 100%;        /* Fluid width stretches card container side-to-side on mobile */
+        max-width: 320px;   /* Safe readable boundary limit */
+        padding-right: 24px; 
+        box-sizing: border-box; 
+    }
+}
