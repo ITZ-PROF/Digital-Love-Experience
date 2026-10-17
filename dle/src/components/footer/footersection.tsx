@@ -24,8 +24,8 @@ function Footer(){
             <div className='upper-footer-section-end'> 
                 <ul className='upper-footer-section-end-list'>
                     <li className='list-header'>Support</li>
-                    <li><a href='#'>Privacy Center</a></li>
-                    <li><a href='#'>Privacy Policy</a></li>
+                    <li><a href='/'>Privacy Center</a></li>
+                    <li><a href='/'>Privacy Policy</a></li>
                 </ul>
             </div>
 
@@ -36,13 +36,13 @@ function Footer(){
             </p>
             <ul className='icon-list'>
                 <li>
-                    <img src={ig}/>
+                    <img src={ig} alt='icon'/>
                 </li>
                 <li>
-                     <img src={x}/>
+                     <img src={x}  alt='icon'/>
                 </li>
                 <li>
-                     <img src={fb}/>
+                     <img src={fb}  alt='icon'/>
                 </li>
             </ul>
            </div>
