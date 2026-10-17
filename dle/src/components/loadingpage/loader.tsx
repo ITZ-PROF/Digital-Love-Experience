@@ -11,7 +11,11 @@ import icon6 from '../../assets/loaderIcons/lover.svg';
 
 const LOADING_ICONS = [icon1, icon2, icon3, icon4, icon5, icon6];
 
-function LoadingPage() {
+interface LoadingPageProps {
+  isExiting?: boolean;
+}
+
+function LoadingPage({ isExiting = false }: LoadingPageProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
@@ -25,7 +29,11 @@ function LoadingPage() {
   }, []);
 
   return (
-    <div className="loading-page-container">
+    <div
+      className={`loading-page-container ${isExiting ? 'is-exiting' : ''}`}
+      role="status"
+      aria-label="Loading your experience"
+    >
       <div className="loading-icon-wrapper">
         {LOADING_ICONS.map((src, index) => (
           <img

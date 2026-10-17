@@ -7,20 +7,30 @@ import { useEffect, useState } from 'react';
 
 
 function Applive() {
-const [loading, setLoading] = useState(true);
+  const [transitioning, setTransitioning] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(()=>{
-const timer = setTimeout(()=> setLoading(false), 2000)
+  useEffect(() => {
+    const startTransition = window.setTimeout(() => {
+      setTransitioning(true);
+    }, 2000);
+    const finishTransition = window.setTimeout(() => {
+      setLoading(false);
+    }, 2700);
 
-    return ()=> clearTimeout(timer);
-})
+    return () => {
+      window.clearTimeout(startTransition);
+      window.clearTimeout(finishTransition);
+    };
+  }, []);
 
 
   return (
     <div className="App">
-      {
-        loading? <LoadingPage/> : <Homepage/>
-      }
+      <div className={`home-transition ${transitioning ? 'is-visible' : ''}`}>
+        <Homepage />
+      </div>
+      {loading && <LoadingPage isExiting={transitioning} />}
     </div>
   );
 }
