@@ -1,11 +1,11 @@
 .hero-section {
-  min-height: 80vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   margin-top: 70px;
-  overflow-x: hidden; /* Prevents 3D elements from creating horizontal scrollbars */
+  overflow: hidden; /* Contain the desktop 3D carousel within the hero */
   width: 100%;
 }
 
@@ -45,7 +45,8 @@
 /* --- Full-Screen Panorama Slider Styling --- */
 
 .panorama-container {
-  width: 100vw; /* Take up absolute full screen viewport width */
+  width: 100%;
+  max-width: 100%;
   height: 250px;
   position: relative;
   cursor: grab;
@@ -95,9 +96,9 @@
    ========================================================================== */
 .hero-responsive-image-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 Columns for Tablet devices */
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 Columns for Tablet devices */
   gap: 16px;
-  width: 100%;
+  width: min(100%, 1200px);
   max-width: 1200px;
   padding: 0 24px 40px 24px;
   box-sizing: border-box;
@@ -105,6 +106,7 @@
 }
 
 .grid-image-item {
+  min-width: 0;
   width: 100%;
   aspect-ratio: 360 / 400; /* Mirrors the exact aspect ratio of your desktop panorama items */
   border-radius: 4px;
@@ -136,9 +138,19 @@
 
 @media (max-width: 639px) {
   .hero-responsive-image-grid {
-    grid-template-columns: repeat(0, 1fr); /* Collapses smoothly into a single card stack layout for small mobile viewports */
+    grid-template-columns: repeat(1, minmax(0, 1fr)); /* Single column on small mobile viewports */
     gap: 12px;
     padding: 0 16px 40px 16px;
+  }
+
+  .hero-section {
+    min-height: auto;
+    padding-inline: 16px;
+  }
+
+  .hero-responsive-image-grid {
+    width: 100%;
+    padding-inline: 0;
   }
 
   .hero-title {

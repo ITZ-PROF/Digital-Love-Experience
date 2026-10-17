@@ -1,5 +1,5 @@
 .cta-section{
-    height: 100vh;
+    min-height: 100vh;
     width: 100%;
     display: flex;
     align-items: center;
@@ -10,11 +10,14 @@
 .cta-section-wrapper{
     align-items: center;
     justify-content: space-evenly;
-    height: 60vh;
-    width: 1150px;
+    min-height: 60vh;
+    width: min(1150px, calc(100% - 48px));
+    max-width: 100%;
     background-color: var(--primary);
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
+    padding: 32px;
 
 }
 
@@ -44,4 +47,27 @@
     font-size: var(--font-size-h6);
     margin-top: 0px;
 
+}
+
+@media (max-width: 639px) {
+    .cta-section {
+        min-height: auto;
+        padding: 48px 0;
+    }
+
+    .cta-section-wrapper {
+        width: calc(100% - 32px);
+        min-height: 360px;
+        height: auto;
+        padding: 28px 18px;
+        text-align: center;
+    }
+
+    .message {
+        font-size: calc(var(--font-size-h2) * 0.75);
+    }
+
+    .sub-message {
+        max-width: 100%;
+    }
 }

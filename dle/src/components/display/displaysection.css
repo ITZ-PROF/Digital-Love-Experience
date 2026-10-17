@@ -23,6 +23,7 @@
   align-items: center;
   justify-content: space-between;
   box-sizing: border-box;
+  min-width: 0;
 }
 
 .display-text {
@@ -33,6 +34,7 @@
   color: var(--color-text-inverse);
   line-height: 1.3; /* Adjusted from 1 to stop vertical sentence collisions */
   letter-spacing: -1px; /* Less extreme tracking for cleaner readability */
+  min-width: 0;
 }
 
 .display-subtext1 {
@@ -70,7 +72,8 @@
     justify-content: flex-start;
     gap: 40px;
     margin-top: 0;
-    padding: 0;
+    width: 100%;
+    padding: 0 24px;
   }
 
   .display-text {
