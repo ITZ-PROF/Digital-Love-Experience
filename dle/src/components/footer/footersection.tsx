@@ -9,16 +9,16 @@ function Footer(){
         <div>
            <div className='upper-footer-section'>
             <div className='upper-footer-section-start'>
-                <img src={logo_variant_1}/>
+                <img src={logo_variant_1} alt='DLE_logo'/>
                 <p>Every moment deserves its own page.</p>
             </div>
             <div className='upper-footer-section-mid'>
                 <ul className='upper-footer-section-mid-list'>
                     <li className='list-header'>Products</li>
-                    <li><a href='#'>Features</a></li>
-                    <li><a href='#'>Pricing</a></li>
-                    <li><a href='#'>Templates</a></li>
-                    <li><a href='#'>Examples</a></li>
+                    <li><a href='/'>Features</a></li>
+                    <li><a href='/'>Pricing</a></li>
+                    <li><a href='/'>Templates</a></li>
+                    <li><a href='/'>Examples</a></li>
                 </ul>
             </div>
             <div className='upper-footer-section-end'> 
