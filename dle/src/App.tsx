@@ -2,6 +2,7 @@ import './App.css';
 import Homepage from './pages/home/Homepage';
 import LoadingPage from './components/loadingpage/loader';
 import { useEffect, useState } from 'react';
+import Login from './pages/auth/login';
 
 
 
@@ -27,10 +28,11 @@ function Applive() {
 
   return (
     <div className="App">
-      <div className={`home-transition ${transitioning ? 'is-visible' : ''}`}>
+      {/* <div className={`home-transition ${transitioning ? 'is-visible' : ''}`}>
         <Homepage />
       </div>
-      {loading && <LoadingPage isExiting={transitioning} />}
+      {loading && <LoadingPage isExiting={transitioning} />} */}
+      <Login/>
     </div>
   );
 }
