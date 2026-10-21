@@ -16,7 +16,8 @@
     align-items: center;
     flex-direction: column;
     box-sizing: border-box;
-        padding: 24px 16px;
+    padding-inline: 24px;
+    padding-block: -25px;
 
 }
 
