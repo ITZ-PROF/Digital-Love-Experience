@@ -1,0 +1,79 @@
+/* Base Container */
+.input-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px; /* Responsive maximum width */
+  margin: 20px 0;
+}
+
+/* Base Field Styling (Empty State) */
+.custom-field {
+  width: 100%;
+  padding: 16px 12px;
+  font-size: var(--font-size-base);
+  border: none;
+  background-color: #f5f5f5; /* Default background color */
+  outline: none;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Adjust top padding for textarea to make room for floating label */
+textarea.custom-field {
+  resize: vertical;
+  padding-top: 24px;
+}
+
+/* Base Label Styling (Centered Left) */
+.custom-label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: transparent;
+  color: #000000;
+  pointer-events: none; /* Allows clicking "through" the label onto the input */
+  transition: all 0.2s ease;
+  font-size: var(--font-size-base);
+}
+
+/* Center-Left adjustments for Textarea container */
+.input-container.multiline .custom-label {
+  top: 24px; /* Pins it neatly near the top-left area instead of absolute center */
+}
+
+/* 1. Hover State Animations */
+.input-container:hover .custom-field {
+  background-color: #F1DDDD;
+}
+
+.input-container:hover .custom-label:not(.floating) {
+  top: 0;
+  transform: translateY(-120%) ;
+  left: 12px;
+  padding: 0 4px;
+  font-size: var(--font-size-base);
+
+}
+
+/* 2. Floating State (Triggers when focused or text exists) */
+.custom-label.floating {
+  top: 0;
+  transform: translateY(-120%) ;
+  left: 12px;
+  padding: 0 4px;
+  color: #000000;
+  font-size: var(--font-size-base);
+}
+
+/* 3. Active / Focus State */
+.custom-field:focus {
+  background-color: #ffffff !important; /* Forces background white */
+  border: 2px solid var(--primary); /* Adds colored border */
+  padding: 15px 11px; /* Adjusts padding slightly to offset 2px border expansion */
+}
+
+/* Extra alignment adjustment for active textarea */
+textarea.custom-field:focus {
+  padding-top: 23px;
+}

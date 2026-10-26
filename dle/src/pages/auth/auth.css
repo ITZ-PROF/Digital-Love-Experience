@@ -1,0 +1,113 @@
+/* Base Container - Mobile First layout (Stacked vertically) */
+.authPage {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+    box-sizing: border-box;
+    
+}
+
+/* Left Form Section - Full width on mobile, centered content */
+.authpage-left {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    box-sizing: border-box;
+    padding-inline: 24px;
+    padding-block: -25px;
+
+}
+
+/* Restrict input and button widths so they match clean layouts */
+.authpage-left > *, 
+.authpage-left .input-container { 
+    width: 100%;
+    max-width: 420px;       /* Keeps fields from getting unnaturally wide on desktop */
+}
+
+/* Header Text */
+.prompt {
+    font-size: var(--font-size-h5);
+    margin-top: -10px;
+    text-align: center;
+    width: 100%;
+}
+
+/* Clean, Responsive Button Design */
+.verify-btn {
+    background-color: var(--color-brand);
+    color: var(--color-text-inverse);
+    border: none;
+    padding: 16px 0;         /* Vertical padding only */
+    width: 100%;             /* Fills up exactly to the 420px maximum wrapper boundary */
+    max-width: 420px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    font-family: var(--font-primary);
+    white-space: nowrap; 
+    transition: all ease-in-out 0.3s;
+    margin-top: 16px;
+}
+
+/* Standardized hover states without drastic width adjustments */
+.verify-btn:hover {
+    background-color: var(--color-accent);
+    opacity: 0.9;
+}
+
+.login-action {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.login-link {
+    color: var(--primary);
+    font-weight: var(--font-weight-medium);
+    transition: all ease-in-out 0.3s;
+    text-decoration: none;
+}
+
+.login-link:hover {
+    text-decoration: underline;
+}
+
+/* Right Image Section - HIDDEN BY DEFAULT ON MOBILE */
+.authpage-right {
+    display: none; 
+    width: 50%;
+    height: 100vh;
+    background-color: #f9f9f9; /* Optional background placeholder */
+    justify-content: center;
+    align-items: center;
+}
+
+.authImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    box-sizing: border-box;
+}
+
+
+
+
+/* 🖥️ DESKTOP MEDIA QUERY (Screens wider than 1024px) */
+@media (min-width: 1024px) {
+    .authPage {
+        flex-direction: row; /* Arranges form and image side-by-side */
+    }
+
+    .authpage-left {
+        width: 50%;         /* Splitting view exactly 50/50 */
+        justify-content: flex-start;
+    }
+
+    .authpage-right {
+        display: flex;      /* REVEALS the image division container on desktop */
+    }
+}
