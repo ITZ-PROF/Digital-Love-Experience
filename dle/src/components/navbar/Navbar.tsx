@@ -1,4 +1,4 @@
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, Link} from 'react-router-dom';
 import logo from '../../assets/logo.svg';
 import profileLogo from '../../assets/profileLogo.svg';
 import { useState, useEffect,  } from 'react';
@@ -63,9 +63,10 @@ function Navbar({ type = 'unauthenticated', variant = 'light' }: NavbarProps) {
 
       {/* Nav links container: conditionally hides or slides down */}
       <div className={`navbar-links ${isMobile ? 'mobile-menu' : ''} ${isMenuOpen ? 'show' : ''}`}>
-        <a href="/" className="navbar-link">Home</a>
-        <a href="/about" className="navbar-link">Sample</a>
-        <a href="/contact" className="navbar-link">Contact Us</a>
+        <Link to="/" className="navbar-link">Home</Link>
+        <Link to="form" className="navbar-link">Samples</Link>
+        <Link to="form" className="navbar-link">Pricing</Link>
+        <Link to="/form" className="navbar-link">Contact Us</Link>
         <button className="btn-primary" onClick={handleClick}>Create Experience</button>
         
         {type === 'authenticated' && (
