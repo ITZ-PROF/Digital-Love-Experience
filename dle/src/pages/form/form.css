@@ -1,174 +1,541 @@
-/* Full Screen Centered Container Layout */
-.dev-page-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* ========================================================
+   🌸 FLORAL BACKGROUND OUTER WINDOW FRAME
+   ======================================================== */
+.stepper-window-frame {
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 24px 16px;
   box-sizing: border-box;
-  font-family: var(--font-primary, sans-serif);
+  background-color: #5a1216; /* Fallback deep wine base tone */
+  
+  /* Link your background image asset cleanly here */
+  background-image: url('../../assets/floral-background.jpg'); 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; /* Flush on mobile, adds padding on desktop screens */
 }
 
-/* Glassmorphism Presentation Card Wrapper */
-.dev-card {
-  background: #ffffff;
-  padding: 40px 32px;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  width: 100%;
-  max-width: 480px;
-  text-align: center;
+/* Base Project Layout Container */
+.stepper-page-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   box-sizing: border-box;
-  animation: cardFloat 4s ease-in-out infinite;
-}
-
-/* Animated Layout Elements */
-.dev-icon-wrapper {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  background-color: rgba(52, 152, 219, 0.1); /* Subtle brand tint background */
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-brand, #3498db);
-  margin-bottom: 24px;
-}
-
-.dev-svg-icon {
-  width: 40px;
-  height: 40px;
-  z-index: 2;
-  animation: toolWiggle 2.5s ease-in-out infinite;
-}
-
-/* Radar Pulse Wave Backing Interaction Ring */
-.dev-pulse-ring {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border: 2px solid var(--color-brand, #3498db);
-  border-radius: 50%;
-  opacity: 0;
-  z-index: 1;
-  animation: radarPulse 2s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
-}
-
-/* Text Mechanics Styling */
-.dev-title {
-  font-size: clamp(1.5rem, 5vw, 1.8rem);
-  font-weight: var(--font-weight-bold, 700);
-  color: #2c3e50;
-  margin: 0 0 12px 0;
-}
-
-.dev-subtitle {
-  font-size: 1rem;
-  color: #7f8c8d;
-  line-height: 1.6;
-  margin: 0 0 28px 0;
-}
-
-/* Progress Indicator Elements */
-.dev-progress-track {
-  width: 100%;
-  height: 6px;
-  background-color: #ecf0f1;
-  border-radius: 999px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
-
-.dev-progress-fill {
-  width: 75%; /* Hardcoded progress status value line match */
-  height: 100%;
-  background-color: var(--color-brand, #3498db);
-  border-radius: 999px;
-  animation: progressShimmer 2s infinite linear;
-  background-image: linear-gradient(
-    90deg, 
-    rgba(255,255,255,0) 0%, 
-    rgba(255,255,255,0.4) 50%, 
-    rgba(255,255,255,0) 100%
-  );
-  background-size: 200% 100%;
-}
-
-.dev-progress-text {
-  font-size: 0.85rem;
-  color: #95a5a6;
-  font-weight: 500;
-  margin-bottom: 32px;
-}
-
-/* Interactive Navigation Action Button */
-.dev-back-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background-color: #2c3e50;
-  color: #ffffff;
-  border: none;
-  padding: 14px 28px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  width: 100%;
-}
-
-.dev-back-btn:hover {
-  background-color: #1a252f;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.btn-arrow-icon {
-  width: 16px;
-  height: 16px;
-  transition: transform 0.2s ease;
-}
-
-.dev-back-btn:hover .btn-arrow-icon {
-  transform: translateX(-4px); /* Shifts structural arrow indicator left on actions */
 }
 
 /* ========================================================
-   KEYFRAME ANIMATION LOGIC ENGINE DEFINE
+   🟥 LEFT SIDEBAR STYLES (Burgundy Navigation Block)
    ======================================================== */
-@keyframes cardFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+.stepper-sidebar {
+  background-color: #7d0b11; /* Matched rich burgundy color profile hex value */
+  color: #ffffff;
+  padding: 12px 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-@keyframes toolWiggle {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-10deg); }
-  75% { transform: rotate(15deg); }
+.sidebar-brand-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 50px;
 }
 
-@keyframes radarPulse {
-  0% { transform: scale(1); opacity: 0.5; }
-  100% { transform: scale(1.4); opacity: 0; }
+.stepper-circle-back {
+  background-color: #ffffff;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  position: absolute;
+  left: 24px;
 }
 
-@keyframes progressShimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+.stepper-circle-back:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-/* Mobile Layout Responsive Adjustments */
-@media (max-width: 480px) {
-  .dev-card {
-    padding: 32px 20px;
+.brand-logo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.brand-logo-placeholder img {
+  display: block;
+  width: 116px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.logo-icon-shape {
+  font-size: 20px;
+}
+
+.logo-text-string {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  overflow: visible;
+}
+
+.step-item-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  margin: 0 12px;
+  padding: 8px 12px;
+  border-radius: 0;
+  color: #ffffff;
+  opacity: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  box-sizing: border-box;
+  width: calc(100% - 24px);
+  text-align: left;
+  font: inherit;
+  border: 0;
+  background: transparent;
+}
+
+.step-item-row:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 29px;
+  top: calc(100% - 1px);
+  height: 14px;
+  border-left: 2px solid rgba(255, 255, 255, 0.45);
+}
+
+.step-item-row.is-active {
+  background-color: #ffffff;
+  color: #7d0b11;
+}
+
+.step-badge-number {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex: 0 0 36px;
+  background-color: #e2e2e2;
+  color: #7d0b11;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+}
+
+.step-badge-number-container {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex: 0 0 36px;
+  background-color: #e2e2e2;
+  color: #7d0b11;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.step-item-row.is-active .step-badge-number-container {
+  background-color: #7d0b11;
+  color: #ffffff;
+}
+
+.step-item-row.is-completed .step-badge-number-container {
+  background-color: #ffffff;
+  color: #7d0b11;
+}
+
+.step-item-row:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.step-text-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.step-title-text {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.step-subtitle-text {
+  display: block;
+  margin-top: 3px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 11px;
+  line-height: 1.2;
+  white-space: normal;
+}
+
+.step-item-row.is-active .step-subtitle-text {
+  color: rgba(125, 11, 17, 0.72);
+}
+
+/* ========================================================
+   ⬜ CENTERED WHITE CARD CONTAINER
+   ======================================================== */
+.stepper-content-workspace {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0; /* Edge to edge on mobile displays */
+}
+
+/* The solid inner layout canvas box mimicking uploaded file view */
+.workspace-inner-card {
+  background-color: #ffffff;
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 40px 24px;
+}
+
+.workspace-header-heading {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.workspace-header-heading h1 {
+  font-size: clamp(1.25rem, 4.5vw, 1.85rem);
+  font-weight: 600;
+  color: #111111;
+  margin: 0 0 12px 0;
+}
+
+.workspace-header-heading h2 {
+  font-size: clamp(1.05rem, 3.8vw, 1.45rem);
+  color: #444444;
+  font-weight: 500;
+  margin: 0;
+}
+
+.workspace-form-body-panel {
+  flex-grow: 1;
+  width: 100%;
+  max-width: 440px; /* Form items maintain precise layout limits */
+  margin: 0 auto;
+}
+
+/* Custom Select Dropdown Box */
+.dropdown-select-container {
+  position: relative;
+  width: 100%;
+  margin-top: 24px;
+}
+
+.custom-select-element {
+  width: 100%;
+  padding: 16px 12px;
+  font-size: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #f7f7f9; /* Subtle gray background tint matching inputs */
+  outline: none;
+  box-sizing: border-box;
+  appearance: none;
+  cursor: pointer;
+}
+
+.custom-select-element:focus {
+  background-color: #ffffff;
+  border-color: #7d0b11;
+}
+
+.select-floating-label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888888;
+  font-size: 16px;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.custom-select-element:focus ~ .select-floating-label,
+.custom-select-element.has-value ~ .select-floating-label {
+  top: 0;
+  transform: translateY(-50%) scale(0.85);
+  left: 10px;
+  color: #7d0b11;
+  padding: 0 4px;
+  background-color: #ffffff;
+}
+
+.select-arrow-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #7d0b11;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+/* WORKSPACE NAV BUTTONS FOOTER LINE */
+.workspace-actions-footer {
+  display: flex;
+  justify-content: flex-end; /* Aligns next/submit button neatly to the right edge */
+  align-items: center;
+  margin-top: 40px;
+  max-width: 440px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.action-link-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 12px 24px;
+  transition: all 0.2s ease;
+}
+
+.action-link-btn.back {
+  color: #888888;
+  margin-right: auto; /* Separates the back button cleanly to the opposite left side */
+  padding-left: 0;
+}
+
+.action-link-btn.next {
+  color: #111111; /* Dark text link button behavior matching design specs */
+}
+
+.action-link-btn.next:hover {
+  transform: translateX(2px);
+}
+
+/* ========================================================
+   🖥️ DESKTOP DISPLAY LAYOUT MEDIA QUERIES (Wider than 1024px)
+   ======================================================== */
+@media (min-width: 1024px) {
+  .stepper-window-frame {
+    padding: 40px 60px; /* Injects breathing space to expose background framing elements */
+  }
+
+  .stepper-page-container {
+    flex-direction: row;
+    width: 100%;
+    max-width: 1240px; /* Clamps inner engine structure cleanly */
+    height: 620px;     /* Set fixed workspace height ratio matching upload canvas proportions */
+    min-height: auto;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Fixed Left Column Layout Sidebar */
+  .stepper-sidebar {
+    width: 300px;
+    height: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 32px 0;
+    gap: 32px;
+  }
+
+  .steps-list {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    overflow: visible;
+  }
+
+  .step-item-row {
+    margin: 0 16px;
+    padding: 8px 12px;
+  }
+
+  .step-badge-number {
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .step-title-text {
+    font-size: 16px;
+  }
+
+  .step-subtitle-text {
+    display: block; /* Restores step details text description strings */
+    font-size: 11px;
+    white-space: normal;
+  }
+
+  /* Right-Side Centered Workspace Dashboard Element */
+  .stepper-content-workspace {
+    height: 100%;
+    background-color: transparent;
+  }
+
+  /* Perfectly centered split layout card inside desktop viewports */
+  .workspace-inner-card {
+    height: 100%;
+    padding: 50px 60px;
+    justify-content: center; /* Vertical alignment centered centering */
+  }
+
+  .workspace-header-heading {
+    margin-bottom: 32px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .stepper-sidebar {
+    padding-top: 8px;
+  }
+
+  .sidebar-brand-wrapper {
+    display: flex;
+    padding: 8px 12px;
+    box-sizing: border-box;
+  }
+
+  .stepper-circle-back {
+    left: 12px;
+  }
+
+  .steps-list {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0;
+    padding: 12px 12px 16px;
+  }
+
+  .step-item-row {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    min-height: 0;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 8px;
+    margin: 0;
+    padding: 0 4px;
+    text-align: center;
+    background: transparent;
+    color: #ffffff;
+  }
+
+  .step-item-row.is-active {
+    background: transparent;
+    color: #ffffff;
+  }
+
+  .step-badge-number-container {
+    position: relative;
+    z-index: 1;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border: 2px solid #ffffff;
+    background-color: #7d0b11;
+    color: #ffffff;
+  }
+
+  .step-item-row.is-active .step-badge-number-container {
+    background-color: #ffffff;
+    color: #7d0b11;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+  }
+
+  .step-item-row.is-completed .step-badge-number-container {
+    background-color: #ffffff;
+    color: #7d0b11;
+  }
+
+  .step-item-row:not(:last-child)::after {
+    left: calc(50% + 18px);
+    top: 16px;
+    width: calc(100% - 36px);
+    height: 0;
+    border-left: 0;
+    border-top: 2px solid rgba(255, 255, 255, 0.45);
+  }
+
+  .step-text-meta {
+    width: 100%;
+  }
+
+  .step-title-text {
+    font-size: clamp(10px, 2.2vw, 13px);
+    line-height: 1.15;
+    white-space: normal;
+  }
+
+  .step-subtitle-text {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .steps-list {
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .step-item-row {
+    padding-right: 2px;
+    padding-left: 2px;
+  }
+
+  .step-badge-number-container {
+    width: 30px;
+    height: 30px;
+    flex-basis: 30px;
+  }
+
+  .step-item-row:not(:last-child)::after {
+    left: calc(50% + 16px);
+    top: 14px;
+    width: calc(100% - 32px);
   }
 }

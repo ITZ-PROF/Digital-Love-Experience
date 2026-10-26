@@ -1,59 +1,130 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import './form.css';
+import InputField from '../../components/inputfield/input';
+import logo from '../../assets/logo_variant_2.svg'
+
+interface StepConfig {
+  id: number;
+  title: string;
+  subtitle: string;
+}
+
+const STEPS: StepConfig[] = [
+  { id: 1, title: 'Basic Info', subtitle: 'Help the recipient know the creator' },
+  { id: 2, title: 'Recipient Info', subtitle: 'Information for the webpage' },
+  { id: 3, title: 'Experience Info', subtitle: 'Express your emotions and affection' },
+  { id: 4, title: 'Payment Info', subtitle: 'Details for payment process' }
+];
 
 export default function Form() {
-  const navigate = useNavigate();
+  const [activeStep, setActiveStep] = useState<number>(1);
+  const [occasion, setOccasion] = useState<string>('');
+
+  const handleNext = () => {
+    if (activeStep < STEPS.length) setActiveStep((prev) => prev + 1);
+  };
+
+  const handleBack = () => {
+    if (activeStep > 1) setActiveStep((prev) => prev - 1);
+  };
 
   return (
-    <div className="dev-page-container" role="main">
-      <div className="dev-card">
-        {/* Animated Construction Icon / Graphic */}
-        <div className="dev-icon-wrapper">
-          <svg 
-            xmlns="http://w3.org" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="1.5" 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            className="dev-svg-icon"
-          >
-            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-          </svg>
-          <div className="dev-pulse-ring"></div>
-        </div>
+    // 🌸 Main page container with floral framing styles applied
+    <div className="stepper-window-frame">
+      <div className="stepper-page-container">
+        
+        {/* 🧭 LEFT SIDEBAR */}
+        <aside className="stepper-sidebar">
+          <div className="sidebar-brand-wrapper">
+            <button className="stepper-circle-back" onClick={handleBack} disabled={activeStep === 1} type="button">
+              &larr;
+            </button>
+            <div className="brand-logo-placeholder">
+              <img src={logo} alt="DLE" />
+            </div>
+          </div>
 
-        {/* Content Section */}
-        <h1 className="dev-title">Form Under Construction</h1>
-        <p className="dev-subtitle">
-          We are currently building this experience room configuration panel. This feature will be live very soon!
-        </p>
+          <nav className="steps-list" aria-label="Progress tracker">
+            {STEPS.map((step) => {
+              const isActive = step.id === activeStep;
+              const isCompleted = step.id < activeStep;
+              
+              return (
+                <button
+                  type="button"
+                  key={step.id} 
+                  className={`step-item-row ${isActive ? 'is-active' : ''} ${isCompleted ? 'is-completed' : ''}`}
+                  onClick={() => setActiveStep(step.id)}
+                  aria-current={isActive ? 'step' : undefined}
+                  aria-label={`Go to step ${step.id}: ${step.title}`}
+                >
+                  <div className="step-badge-number-container">
+                    {isCompleted ? '✓' : step.id}
+                  </div>
+                  <div className="step-text-meta">
+                    <span className="step-title-text">{step.title}</span>
+                    <span className="step-subtitle-text">{step.subtitle}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </nav>
+        </aside>
 
-        {/* Progress Bar Visual Element */}
-        <div className="dev-progress-track">
-          <div className="dev-progress-fill"></div>
-        </div>
-        <span className="dev-progress-text">Development Progress: 75%</span>
+        {/* ⬜ CENTERED WHITE WORKSPACE CARD PANEL */}
+        <main className="stepper-content-workspace">
+          <div className="workspace-inner-card">
+            
+            <header className="workspace-header-heading">
+              <h1>Everything You Need for Any Special Moment</h1>
+              <h2>{STEPS[activeStep - 1].title}</h2>
+            </header>
 
-        {/* Interactive Navigation Action */}
-        <button className="dev-back-btn" onClick={() => navigate('/')}>
-          <svg 
-            xmlns="http://w3.org" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            className="btn-arrow-icon"
-          >
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-          Go Back
-        </button>
+            <section className="workspace-form-body-panel">
+              {activeStep === 1 && (
+                <div className="step-form-fade-in">
+                  <InputField label="Full Name" multiline={false} />
+                  
+                  {/* Select Occasion Input Field Dropdown */}
+                  <div className="dropdown-select-container">
+                    <select 
+                      className={`custom-select-element ${occasion ? 'has-value' : ''}`}
+                      value={occasion}
+                      onChange={(e) => setOccasion(e.target.value)}
+                    >
+                      <option value="" disabled hidden></option>
+                      <option value="birthday">Birthday</option>
+                      <option value="anniversary">Anniversary</option>
+                      <option value="wedding">Wedding</option>
+                    </select>
+                    <label className="select-floating-label">Select Occasion</label>
+                    <div className="select-arrow-icon">&#x25BC;</div>
+                  </div>
+                </div>
+              )}
+
+              {activeStep > 1 && (
+                <div className="step-form-fade-in placeholder-step-panel">
+                  <p>{STEPS[activeStep - 1].title} content panel will load here.</p>
+                </div>
+              )}
+            </section>
+
+            <footer className="workspace-actions-footer">
+              <button 
+                className="action-link-btn back" 
+                onClick={handleBack} 
+                style={{ visibility: activeStep === 1 ? 'hidden' : 'visible' }}
+              >
+                Back
+              </button>
+              <button className="action-link-btn next" onClick={handleNext}>
+                {activeStep === STEPS.length ? 'Submit' : 'Next'}
+              </button>
+            </footer>
+
+          </div>
+        </main>
       </div>
     </div>
   );
