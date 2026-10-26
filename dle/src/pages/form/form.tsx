@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './form.css';
 import InputField from '../../components/inputfield/input';
 import logo from '../../assets/logo_variant_2.svg'
@@ -19,6 +19,14 @@ const STEPS: StepConfig[] = [
 export default function Form() {
   const [activeStep, setActiveStep] = useState<number>(1);
   const [occasion, setOccasion] = useState<string>('');
+  const [recipientName, setRecipientName] = useState('');
+  const [recipientWhatsapp, setRecipientWhatsapp] = useState('');
+  const [heartfeltMessage, setHeartfeltMessage] = useState('');
+  const [songLink, setSongLink] = useState('');
+  const [selectedColor, setSelectedColor] = useState('purple');
+  const [themeMode, setThemeMode] = useState('dark');
+  const [senderWhatsapp, setSenderWhatsapp] = useState('');
+  const [serviceProvider, setServiceProvider] = useState('');
 
   const handleNext = () => {
     if (activeStep < STEPS.length) setActiveStep((prev) => prev + 1);
@@ -103,9 +111,103 @@ export default function Form() {
                 </div>
               )}
 
-              {activeStep > 1 && (
-                <div className="step-form-fade-in placeholder-step-panel">
-                  <p>{STEPS[activeStep - 1].title} content panel will load here.</p>
+              {activeStep === 2 && (
+                <div className="step-form-fade-in form-fields-stack">
+                  <InputField
+                    label="Recipient Full Name"
+                    multiline={false}
+                    value={recipientName}
+                    onChange={(event) => setRecipientName(event.target.value)}
+                  />
+                  <InputField
+                    label="Recipient WhatsApp Number"
+                    multiline={false}
+                    value={recipientWhatsapp}
+                    onChange={(event) => setRecipientWhatsapp(event.target.value)}
+                  />
+                  <InputField
+                    label="Write your heartfelt message"
+                    multiline={true}
+                    rows={4}
+                    value={heartfeltMessage}
+                    onChange={(event) => setHeartfeltMessage(event.target.value)}
+                  />
+                </div>
+              )}
+
+              {activeStep === 3 && (
+                <div className="step-form-fade-in form-fields-stack">
+                  <InputField
+                    label="Song link (Spotify, YouTube, etc.)"
+                    multiline={false}
+                    value={songLink}
+                    onChange={(event) => setSongLink(event.target.value)}
+                  />
+
+                  <fieldset className="color-picker-fieldset">
+                    <legend className="color-palette-label">Select Background Template Color</legend>
+                    <div className="color-cards-grid">
+                      {[
+                        { id: 'purple', label: 'Purple', color: '#4b0f91' },
+                        { id: 'green', label: 'Green', color: '#087333' },
+                        { id: 'olive', label: 'Olive', color: '#89891c' },
+                      ].map((option) => (
+                        <button
+                          key={option.id}
+                          type="button"
+                          className={`color-card ${selectedColor === option.id ? 'selected' : ''}`}
+                          style={{ backgroundColor: option.color }}
+                          aria-label={`${option.label} template color`}
+                          aria-pressed={selectedColor === option.id}
+                          onClick={() => setSelectedColor(option.id)}
+                        >
+                          <span className="radio-dot" />
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+
+                  <fieldset className="theme-toggle-row">
+                    <legend className="visually-hidden">Choose page theme</legend>
+                    {['dark', 'light'].map((theme) => (
+                      <label className="radio-option" key={theme}>
+                        <input
+                          type="radio"
+                          name="theme"
+                          value={theme}
+                          checked={themeMode === theme}
+                          onChange={() => setThemeMode(theme)}
+                        />
+                        <span className="custom-radio-circle" />
+                        {theme[0].toUpperCase() + theme.slice(1)}
+                      </label>
+                    ))}
+                  </fieldset>
+                </div>
+              )}
+
+              {activeStep === 4 && (
+                <div className="step-form-fade-in form-fields-stack">
+                  <InputField
+                    label="Sender WhatsApp Number"
+                    multiline={false}
+                    value={senderWhatsapp}
+                    onChange={(event) => setSenderWhatsapp(event.target.value)}
+                  />
+                  <div className="dropdown-select-container">
+                    <select
+                      className={`custom-select-element ${serviceProvider ? 'has-value' : ''}`}
+                      value={serviceProvider}
+                      onChange={(event) => setServiceProvider(event.target.value)}
+                      aria-label="Select Service Provider"
+                    >
+                      <option value="" disabled>Select Service Provider</option>
+                      <option value="momo">MTN Mobile Money</option>
+                      <option value="telecel">Telecel Cash</option>
+                      <option value="card">Credit / Debit Card</option>
+                    </select>
+                    <div className="select-arrow-icon" aria-hidden="true">&#x25BC;</div>
+                  </div>
                 </div>
               )}
             </section>
@@ -116,10 +218,14 @@ export default function Form() {
                 onClick={handleBack} 
                 style={{ visibility: activeStep === 1 ? 'hidden' : 'visible' }}
               >
-                Back
+                <span>Back</span>
               </button>
-              <button className="action-link-btn next" onClick={handleNext}>
-                {activeStep === STEPS.length ? 'Submit' : 'Next'}
+              <button
+                type="button"
+                className="action-link-btn next"
+                onClick={activeStep === STEPS.length ? () => window.alert('Form submitted!') : handleNext}
+              >
+                <span>{activeStep === STEPS.length ? 'Save & Share' : activeStep === 3 ? 'Proceed To Preview' : 'Next'}</span>
               </button>
             </footer>
 
