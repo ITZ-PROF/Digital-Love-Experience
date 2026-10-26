@@ -11,7 +11,7 @@ export default function Login(){
     const [verify, setVerify] = useState(false);
 
     // Handles layout toggling and resets steps to step 1
-    const handleFormToggle = (e, isExisting) => {
+    const handleFormToggle = (e: any, isExisting: boolean) => {
         e.preventDefault(); // Stops href anchor from refreshing the web application
         setIsExistingUser(isExisting);
         setVerify(false); // Resets verification status for the new view
