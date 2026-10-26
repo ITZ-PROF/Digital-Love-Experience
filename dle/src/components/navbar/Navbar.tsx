@@ -1,7 +1,9 @@
+import {useNavigate} from 'react-router-dom';
 import logo from '../../assets/logo.svg';
 import profileLogo from '../../assets/profileLogo.svg';
-import { useState, useEffect } from 'react';
+import { useState, useEffect,  } from 'react';
 import './navbar.css';
+import { useAuth } from '../../stores/authstore';
 
 interface NavbarProps {
   type?: 'authenticated' | 'unauthenticated';
@@ -9,8 +11,12 @@ interface NavbarProps {
 }
 
 function Navbar({ type = 'unauthenticated', variant = 'light' }: NavbarProps) {
+
+   const authenticated = useAuth((state) => state.authenticated);
+  const setAuthenticated = useAuth((state) => state.setAuthenticated);
   const [isMobile, setIsMobile] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false); // Controls mobile dropdown visibility
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => {
@@ -25,6 +31,15 @@ function Navbar({ type = 'unauthenticated', variant = 'light' }: NavbarProps) {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const handleClick =()=>{
+    if(!authenticated){
+    navigate('/login');
+  }else{
+    navigate('./form')
+  }
+
+  }
 
   return (
     <nav className={`navbar navbar-${variant}`}>
@@ -51,7 +66,7 @@ function Navbar({ type = 'unauthenticated', variant = 'light' }: NavbarProps) {
         <a href="/" className="navbar-link">Home</a>
         <a href="/about" className="navbar-link">Sample</a>
         <a href="/contact" className="navbar-link">Contact Us</a>
-        <button className="btn-primary">Create Experience</button>
+        <button className="btn-primary" onClick={handleClick}>Create Experience</button>
         
         {type === 'authenticated' && (
           <div className="navbar-profile">
