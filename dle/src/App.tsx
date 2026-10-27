@@ -5,6 +5,7 @@ import LoadingPage from './components/loadingpage/loader';
 import { useEffect, useState } from 'react';
 import Login from './pages/auth/login';
 import Form from './pages/form/form';
+import BirthdayTemplate1 from './components/templates/birthdaytemplate1/BirthdayTemplate1';
 
 function Applive() {
   const [transitioning, setTransitioning] = useState(false);
@@ -38,6 +39,14 @@ function Applive() {
             element={
               <div className={`home-transition ${transitioning ? 'is-visible' : ''}`}>
                 <Homepage />
+              </div>
+            } 
+          />
+          <Route 
+            path="/birthday" 
+            element={
+              <div className={`home-transition ${transitioning ? 'is-visible' : ''}`}>
+                <BirthdayTemplate1 />
               </div>
             } 
           />
