@@ -64,7 +64,7 @@ function Navbar({ type = 'unauthenticated', variant = 'light' }: NavbarProps) {
       {/* Nav links container: conditionally hides or slides down */}
       <div className={`navbar-links ${isMobile ? 'mobile-menu' : ''} ${isMenuOpen ? 'show' : ''}`}>
         <Link to="/" className="navbar-link">Home</Link>
-        <Link to="form" className="navbar-link">Samples</Link>
+        <Link to="/birthday" className="navbar-link">Samples</Link>
         <Link to="form" className="navbar-link">Pricing</Link>
         <Link to="/form" className="navbar-link">Contact Us</Link>
         <button className="btn-primary" onClick={handleClick}>Create Experience</button>
