@@ -256,14 +256,15 @@
 .workspace-form-body-panel {
   flex-grow: 1;
   width: 100%;
-  max-width: 440px; /* Form items maintain precise layout limits */
+  max-width: 540px; /* Form items maintain precise layout limits */
   margin: 0 auto;
+  gap: 15px;
 }
 
 .workspace-form-body-panel .input-container {
   width: 100%;
   max-width: none;
-  margin: 0 0 18px;
+  margin: 20px 0 18px;
 }
 
 .form-fields-stack {
@@ -531,6 +532,301 @@
 
 .step-form-fade-in {
   animation: stepContentEnter 260ms ease-out both;
+}
+
+.experience-success-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(25, 22, 22, 0.48);
+  backdrop-filter: blur(5px);
+  box-sizing: border-box;
+  animation: successBackdropIn 220ms ease-out both;
+}
+
+.experience-success-modal {
+  position: relative;
+  width: min(100%, 570px);
+  min-height: 600px;
+  padding: 70px 34px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #ffffff;
+  color: #171717;
+  text-align: center;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
+  box-sizing: border-box;
+  animation: successCardIn 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.experience-success-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 3px solid #851d1f;
+  background: #ffffff;
+  color: #851d1f;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.experience-success-close:hover {
+  background: #851d1f;
+  color: #ffffff;
+}
+
+.success-confetti-art {
+  width: min(100%, 390px);
+  height: 230px;
+  flex: 0 0 auto;
+  margin: 0 auto 10px;
+  background:
+    radial-gradient(ellipse at 50% 56%, rgba(244, 179, 36, 0.85) 0 2px, transparent 3px),
+    radial-gradient(ellipse at 40% 42%, #ef4f87 0 2px, transparent 3px),
+    radial-gradient(ellipse at 64% 38%, #2db8d3 0 2px, transparent 3px),
+    radial-gradient(ellipse at 30% 62%, #70bd52 0 2px, transparent 3px),
+    radial-gradient(ellipse at 74% 65%, #8052ba 0 2px, transparent 3px),
+    radial-gradient(ellipse at 50% 52%, rgba(244, 192, 46, 0.45), transparent 42%),
+    conic-gradient(from 22deg at 50% 54%, transparent 0 8deg, rgba(47, 180, 209, 0.8) 8deg 10deg, transparent 10deg 26deg, rgba(245, 83, 133, 0.75) 26deg 28deg, transparent 28deg 54deg, rgba(245, 190, 46, 0.75) 54deg 56deg, transparent 56deg 90deg);
+  background-size: 37px 39px, 45px 47px, 53px 51px, 61px 59px, 43px 57px, 100% 100%, 100% 100%;
+  mask-image: radial-gradient(ellipse at center, #000 20%, rgba(0, 0, 0, 0.8) 53%, transparent 76%);
+}
+
+.experience-success-modal > h2 {
+  margin: 0 0 12px;
+  color: #851d1f;
+  font-size: clamp(1.7rem, 5vw, 2.2rem);
+  line-height: 1.15;
+}
+
+.experience-success-copy {
+  max-width: 470px;
+  margin: 0 0 22px;
+  font-size: clamp(0.95rem, 2.6vw, 1.08rem);
+  line-height: 1.45;
+}
+
+.experience-share-row {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e8e8e8;
+  box-sizing: border-box;
+}
+
+.experience-share-link {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #f2f2f4;
+  color: #273142;
+  font-size: 14px;
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.experience-share-link span {
+  color: #9299a5;
+  font-size: 20px;
+}
+
+.experience-copy-button {
+  width: 58px;
+  min-width: 58px;
+  border: 0;
+  border-radius: 14px;
+  background: #851d1f;
+  color: #ffffff;
+  font-size: 26px;
+  cursor: pointer;
+  box-shadow: 0 5px 12px rgba(133, 29, 31, 0.2);
+}
+
+.experience-copy-button:hover,
+.experience-create-new:hover {
+  background: #6f1416;
+}
+
+.experience-copy-status {
+  min-height: 18px;
+  margin: 5px 0 14px;
+  color: #397344;
+  font-size: 12px;
+}
+
+.experience-create-new {
+  width: min(100%, 340px);
+  min-height: 58px;
+  border: 0;
+  border-radius: 999px;
+  background: #851d1f;
+  color: #ffffff;
+  font: inherit;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.experience-create-new:hover {
+  transform: translateY(-1px);
+}
+
+.experience-view-button {
+  margin-top: 15px;
+  padding: 8px 14px;
+  border: 0;
+  background: transparent;
+  color: #851d1f;
+  font: inherit;
+  font-size: 15px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.experience-view-button:hover {
+  color: #521012;
+}
+
+.experience-preview-card {
+  --preview-accent: #4b0f91;
+  width: 100%;
+  min-height: 420px;
+  padding: 64px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #ffffff, color-mix(in srgb, var(--preview-accent) 15%, #ffffff));
+  color: #222222;
+  box-sizing: border-box;
+}
+
+.experience-preview-card.theme-dark {
+  background: linear-gradient(145deg, #1d1b25, color-mix(in srgb, var(--preview-accent) 65%, #15131a));
+  color: #ffffff;
+}
+
+.experience-preview-eyebrow,
+.experience-preview-occasion {
+  color: var(--preview-accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.experience-preview-card.theme-dark .experience-preview-eyebrow,
+.experience-preview-card.theme-dark .experience-preview-occasion {
+  color: #ffffff;
+}
+
+.experience-preview-card h2 {
+  margin: 14px 0;
+  font-size: clamp(1.8rem, 6vw, 2.5rem);
+  text-align: center;
+}
+
+.experience-preview-message {
+  max-width: 420px;
+  margin: 12px 0 30px;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.experience-preview-back {
+  padding: 10px 18px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+@keyframes successBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes successCardIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 600px) {
+  .experience-success-backdrop {
+    padding: 14px;
+  }
+
+  .experience-success-modal {
+    min-height: 0;
+    max-height: min(92dvh, 760px);
+    padding: 62px 20px 30px;
+    overflow-y: auto;
+  }
+
+  .experience-success-close {
+    top: 14px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
+    font-size: 28px;
+  }
+
+  .success-confetti-art {
+    height: clamp(140px, 38vw, 200px);
+    margin-bottom: 4px;
+  }
+
+  .experience-share-row {
+    gap: 8px;
+  }
+
+  .experience-share-link {
+    padding: 13px 10px;
+    font-size: 12px;
+  }
+
+  .experience-copy-button {
+    width: 48px;
+    min-width: 48px;
+  }
+
+  .experience-preview-card {
+    min-height: 360px;
+    padding: 56px 18px 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .experience-success-backdrop,
+  .experience-success-modal {
+    animation-duration: 1ms;
+  }
 }
 
 @keyframes stepContentEnter {

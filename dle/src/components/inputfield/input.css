@@ -3,7 +3,7 @@
   position: relative;
   width: 100%;
   max-width: 400px; /* Responsive maximum width */
-  margin: 20px 0;
+  margin: 40px 0;
 }
 
 /* Base Field Styling (Empty State) */
@@ -57,6 +57,17 @@ textarea.custom-field {
   left: 12px;
   padding: 0 4px;
   font-size: var(--font-size-base);
+  color: var(--primary)
+
+}
+.input-container.multiline:hover .custom-label:not(.floating) {
+  top: 0;
+  transform: translateY(-120%) ;
+  left: 12px;
+  padding: 0 4px;
+  font-size: var(--font-size-base);
+    color: var(--primary)
+
 
 }
 
@@ -66,22 +77,30 @@ textarea.custom-field {
   transform: translateY(-120%) ;
   left: 12px;
   padding: 0 4px;
-  color: #000000;
+  color: var(--primary);
   font-size: var(--font-size-base);
 }
 
 /* Keep the textarea label inside the message box rather than above it. */
 .input-container.multiline .custom-label.floating {
-  top: 8px;
-  transform: none;
+  top: 0;
+  transform: translateY(-120%) ;
   left: 12px;
   padding: 0 4px;
-  background-color: #f5f5f5;
-  font-size: 13px;
+  color: #000000;
+  font-size: var(--font-size-base);
 }
 
 .input-container.multiline .custom-field:focus ~ .custom-label.floating {
-  background-color: #ffffff;
+position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-400%);
+  background-color: transparent;
+  color: #000000;
+  pointer-events: none; /* Allows clicking "through" the label onto the input */
+  transition: all 0.2s ease;
+  font-size: var(--font-size-base);
 }
 
 /* 3. Active / Focus State */
