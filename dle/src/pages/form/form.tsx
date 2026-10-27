@@ -39,7 +39,7 @@ export default function Form() {
   const navigate = useNavigate();
 
   useEffect(() => () => {
-    submitTimers.current.forEach(window.clearTimeout);
+    submitTimers.current.forEach((timer) => window.clearTimeout(timer));
   }, []);
 
   const handleNext = () => {
