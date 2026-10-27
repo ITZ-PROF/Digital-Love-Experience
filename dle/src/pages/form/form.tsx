@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { CSSProperties, useEffect, useRef, useState } from 'react';
 import './form.css';
 import InputField from '../../components/inputfield/input';
 import logo from '../../assets/logo_variant_2.svg'
+import { useNavigate } from 'react-router-dom';
+import LoadingPage from '../../components/loadingpage/loader';
 
 interface StepConfig {
   id: number;
@@ -27,13 +29,75 @@ export default function Form() {
   const [themeMode, setThemeMode] = useState('dark');
   const [senderWhatsapp, setSenderWhatsapp] = useState('');
   const [serviceProvider, setServiceProvider] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingExiting, setIsLoadingExiting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showExperiencePreview, setShowExperiencePreview] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [linkCopied, setLinkCopied] = useState(false);
+  const submitTimers = useRef<number[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => () => {
+    submitTimers.current.forEach((timer) => window.clearTimeout(timer));
+  }, []);
 
   const handleNext = () => {
     if (activeStep < STEPS.length) setActiveStep((prev) => prev + 1);
   };
 
   const handleBack = () => {
-    if (activeStep > 1) setActiveStep((prev) => prev - 1);
+    if (activeStep > 1){
+
+        setActiveStep((prev) => prev - 1)
+    }else{
+        navigate('/')
+    }
+  };
+
+  const handleSaveAndShare = () => {
+    if (isSubmitting) return;
+
+    const shareCode = Math.random().toString(36).slice(2, 8);
+    setShareUrl(`${window.location.origin}/?experience=${shareCode}`);
+    setLinkCopied(false);
+    setShowExperiencePreview(false);
+    setIsLoadingExiting(false);
+    setIsSubmitting(true);
+
+    submitTimers.current.push(window.setTimeout(() => {
+      setIsLoadingExiting(true);
+    }, 1700));
+
+    submitTimers.current.push(window.setTimeout(() => {
+      setIsSubmitting(false);
+      setIsLoadingExiting(false);
+      setShowSuccessModal(true);
+    }, 2400));
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setLinkCopied(true);
+    } catch {
+      setLinkCopied(false);
+    }
+  };
+
+  const handleCreateAnother = () => {
+    setShowSuccessModal(false);
+    setShowExperiencePreview(false);
+    setActiveStep(1);
+    setOccasion('');
+    setRecipientName('');
+    setRecipientWhatsapp('');
+    setHeartfeltMessage('');
+    setSongLink('');
+    setSelectedColor('purple');
+    setThemeMode('dark');
+    setSenderWhatsapp('');
+    setServiceProvider('');
   };
 
   return (
@@ -44,7 +108,7 @@ export default function Form() {
         {/* 🧭 LEFT SIDEBAR */}
         <aside className="stepper-sidebar">
           <div className="sidebar-brand-wrapper">
-            <button className="stepper-circle-back" onClick={handleBack} disabled={activeStep === 1} type="button">
+            <button className="stepper-circle-back" onClick={handleBack} type="button">
               &larr;
             </button>
             <div className="brand-logo-placeholder">
@@ -223,7 +287,8 @@ export default function Form() {
               <button
                 type="button"
                 className="action-link-btn next"
-                onClick={activeStep === STEPS.length ? () => window.alert('Form submitted!') : handleNext}
+                onClick={activeStep === STEPS.length ? handleSaveAndShare : handleNext}
+                disabled={isSubmitting}
               >
                 <span>{activeStep === STEPS.length ? 'Save & Share' : activeStep === 3 ? 'Proceed To Preview' : 'Next'}</span>
               </button>
@@ -232,6 +297,78 @@ export default function Form() {
           </div>
         </main>
       </div>
+
+      <LoadingPage isModal isOpen={isSubmitting} isExiting={isLoadingExiting} />
+
+      {showSuccessModal && (
+        <div
+          className="experience-success-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setShowSuccessModal(false);
+          }}
+        >
+          <section
+            className="experience-success-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="experience-success-title"
+          >
+            <button
+              type="button"
+              className="experience-success-close"
+              onClick={() => setShowSuccessModal(false)}
+              aria-label="Close success message"
+            >
+              ×
+            </button>
+
+            {showExperiencePreview ? (
+              <div className={`experience-preview-card theme-${themeMode}`} style={{ '--preview-accent': selectedColor === 'green' ? '#087333' : selectedColor === 'olive' ? '#89891c' : '#4b0f91' } as CSSProperties}>
+                <span className="experience-preview-eyebrow">A special moment for</span>
+                <h2>{recipientName || 'Someone special'}</h2>
+                {occasion && <p className="experience-preview-occasion">{occasion}</p>}
+                <p className="experience-preview-message">{heartfeltMessage || 'Your heartfelt message will appear here.'}</p>
+                <button type="button" className="experience-preview-back" onClick={() => setShowExperiencePreview(false)}>
+                  Back to sharing
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="success-confetti-art" aria-hidden="true" />
+                <h2 id="experience-success-title">Congratulations!</h2>
+                <p className="experience-success-copy">
+                  You have successfully created an experience. Copy and share with your loved one.
+                </p>
+
+                <div className="experience-share-row">
+                  <span className="experience-share-link" title={shareUrl}>
+                    <span aria-hidden="true">↗</span>
+                    {shareUrl}
+                  </span>
+                  <button
+                    type="button"
+                    className="experience-copy-button"
+                    onClick={handleCopyLink}
+                    aria-label={linkCopied ? 'Link copied' : 'Copy experience link'}
+                  >
+                    {linkCopied ? '✓' : '▢'}
+                  </button>
+                </div>
+                <p className="experience-copy-status" aria-live="polite">
+                  {linkCopied ? 'Link copied to clipboard' : ''}
+                </p>
+
+                <button type="button" className="experience-create-new" onClick={handleCreateAnother}>
+                  Create A New Experience
+                </button>
+                <button type="button" className="experience-view-button" onClick={() => setShowExperiencePreview(true)}>
+                  View Experience
+                </button>
+              </>
+            )}
+          </section>
+        </div>
+      )}
     </div>
   );
 }

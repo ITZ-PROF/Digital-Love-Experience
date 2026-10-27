@@ -40,9 +40,9 @@ function LoadingPage({ isModal = false, isOpen = true, isExiting = false }: Load
     const dialog = dialogRef.current;
     if (!dialog) return;
 
-    if (isOpen) {
+    if (isOpen && !dialog.open) {
       dialog.showModal();
-    } else if (!isExiting) {
+    } else if (!isOpen && dialog.open && !isExiting) {
       dialog.close();
     }
   }, [isModal, isOpen, isExiting]);
