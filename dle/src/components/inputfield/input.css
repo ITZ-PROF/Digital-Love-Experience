@@ -20,8 +20,12 @@
 
 /* Adjust top padding for textarea to make room for floating label */
 textarea.custom-field {
+  display: block;
+  min-height: 112px;
   resize: vertical;
   padding-top: 24px;
+  line-height: 1.5;
+  font-family: inherit;
 }
 
 /* Base Label Styling (Centered Left) */
@@ -47,7 +51,7 @@ textarea.custom-field {
   background-color: #F1DDDD;
 }
 
-.input-container:hover .custom-label:not(.floating) {
+.input-container:not(.multiline):hover .custom-label:not(.floating) {
   top: 0;
   transform: translateY(-120%) ;
   left: 12px;
@@ -64,6 +68,20 @@ textarea.custom-field {
   padding: 0 4px;
   color: #000000;
   font-size: var(--font-size-base);
+}
+
+/* Keep the textarea label inside the message box rather than above it. */
+.input-container.multiline .custom-label.floating {
+  top: 8px;
+  transform: none;
+  left: 12px;
+  padding: 0 4px;
+  background-color: #f5f5f5;
+  font-size: 13px;
+}
+
+.input-container.multiline .custom-field:focus ~ .custom-label.floating {
+  background-color: #ffffff;
 }
 
 /* 3. Active / Focus State */
