@@ -120,7 +120,7 @@ export default function Form() {
                     onChange={(event) => setRecipientName(event.target.value)}
                   />
                   <InputField
-                    label="Recipient WhatsApp Number"
+                    label="Relation With Recipient"
                     multiline={false}
                     value={recipientWhatsapp}
                     onChange={(event) => setRecipientWhatsapp(event.target.value)}
@@ -138,7 +138,7 @@ export default function Form() {
               {activeStep === 3 && (
                 <div className="step-form-fade-in form-fields-stack">
                   <InputField
-                    label="Song link (Spotify, YouTube, etc.)"
+                    label="Send an inspirational quote(optional)"
                     multiline={false}
                     value={songLink}
                     onChange={(event) => setSongLink(event.target.value)}
@@ -189,7 +189,7 @@ export default function Form() {
               {activeStep === 4 && (
                 <div className="step-form-fade-in form-fields-stack">
                   <InputField
-                    label="Sender WhatsApp Number"
+                    label="Enter Mobile Number"
                     multiline={false}
                     value={senderWhatsapp}
                     onChange={(event) => setSenderWhatsapp(event.target.value)}
