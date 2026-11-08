@@ -1,7 +1,7 @@
 import './birthdayTemplate1.css';
 import confettiArt from '../../../assets/confetti.png';
 import templateImage from '../../../assets/templateimage.svg';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export interface BirthdayTemplateData {
   recipientName: string;
@@ -57,9 +57,6 @@ const SAMPLE_DATA: BirthdayTemplateData = {
     '© 2026 Celebration Space. All rights reserved.',
   ],
 };
-
-
-
 function BirthdayTemplate1({
   className = '',
   heroImageUrl = SAMPLE_DATA.heroImageUrl,
@@ -91,6 +88,13 @@ function BirthdayTemplate1({
   return (
     <main className={`birthday-template-container ${className}`.trim()}>
       <section className="hero-section" id="top" aria-labelledby="birthday-title">
+        <button
+          className="hero-back-button"
+          type="button"
+          onClick={() => navigate('/')}
+        >
+          <span aria-hidden="true">←</span> Back
+        </button>
         <img className="hero-template-art" src={confettiArt} alt="" aria-hidden="true" />
 
         <div className="hero-copy">

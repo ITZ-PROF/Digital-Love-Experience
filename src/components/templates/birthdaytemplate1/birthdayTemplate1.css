@@ -36,10 +36,41 @@
   gap: 4%;
   width: 100%;
   max-width: 1440px;
-  height: min(53.125vw, 765px);
+  min-height: clamp(360px, 53.125vw, 765px);
   margin: 0 auto;
   padding: 24px 8.33%;
   overflow: hidden;
+}
+
+.birthday-template-container .hero-back-button {
+  position: absolute;
+  z-index: 1;
+  top: 20px;
+  left: 8.33%;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: var(--birthday-red);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.birthday-template-container .hero-back-button:hover {
+  color: #5f1111;
+}
+
+.birthday-template-container .hero-back-button:focus-visible {
+  outline: 2px solid var(--birthday-red);
+  outline-offset: 4px;
+}
+
+.birthday-template-container .hero-back-button span {
+  font-size: 20px;
+  line-height: 1;
 }
 
 .birthday-template-container .hero-template-art {
@@ -351,9 +382,14 @@
   .birthday-template-container .hero-section {
     flex-direction: row;
     align-items: center;
-    gap: 4%;
-    height: auto;
-    padding: 52px 24px 42px;
+    gap: 16px;
+    min-height: 0;
+    padding: 64px 24px 42px;
+  }
+
+  .birthday-template-container .hero-back-button {
+    top: 18px;
+    left: 24px;
   }
 
   .birthday-template-container .hero-template-art {
@@ -368,27 +404,29 @@
   }
 
   .birthday-template-container .hero-eyebrow {
-    margin-bottom: 12px;
-    font-size: 12px;
+    gap: 7px;
+    margin-bottom: 10px;
+    font-size: clamp(8px, 1.55vw, 12px);
   }
 
   .birthday-template-container .hero-copy h1 {
-    font-size: clamp(30px, 8vw, 42px);
+    font-size: clamp(18px, 4vw, 32px);
   }
 
   .birthday-template-container .hero-byline,
   .birthday-template-container .scroll-prompt {
-    font-size: 13px;
+    font-size: clamp(9px, 1.7vw, 13px);
   }
 
   .birthday-template-container .hero-summary {
-    margin: 20px 0 24px;
-    font-size: 13px;
+    margin: 12px 0 14px;
+    font-size: clamp(9px, 1.7vw, 13px);
   }
 
   .birthday-template-container .hero-image-frame {
-    flex: 0 0 42%;
-    width: 42%;
+    flex-basis: 40%;
+    width: 40%;
+    max-width: 340px;
     transform: none;
   }
 
@@ -473,6 +511,48 @@
   .birthday-template-container .footer-copyright {
     font-size: 12px;
     line-height: 2.4;
+  }
+}
+
+@media (max-width: 480px) {
+  .birthday-template-container .hero-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .birthday-template-container .hero-back-button {
+    left: 16px;
+  }
+
+  .birthday-template-container .hero-copy {
+    flex: none;
+    width: 100%;
+  }
+
+  .birthday-template-container .hero-copy h1 {
+    font-size: clamp(17px, 5vw, 23px);
+  }
+
+  .birthday-template-container .hero-byline {
+    gap: 6px;
+  }
+
+  .birthday-template-container .hero-summary {
+    line-height: 1.4;
+  }
+
+  .birthday-template-container .scroll-prompt {
+    gap: 4px;
+    font-size: 9px;
+  }
+
+  .birthday-template-container .hero-image-frame {
+    flex: none;
+    align-self: center;
+    width: min(100%, 380px);
   }
 }
 
