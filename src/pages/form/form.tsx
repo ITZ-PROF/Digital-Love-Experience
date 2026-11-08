@@ -4,6 +4,7 @@ import InputField from '../../components/inputfield/input';
 import logo from '../../assets/logo_variant_2.svg'
 import { useNavigate } from 'react-router-dom';
 import LoadingPage from '../../components/loadingpage/loader';
+import { useExperiences } from '../../stores/experiencesStore';
 
 interface StepConfig {
   id: number;
@@ -20,6 +21,7 @@ const STEPS: StepConfig[] = [
 
 export default function Form() {
   const [activeStep, setActiveStep] = useState<number>(1);
+  const [creatorName, setCreatorName] = useState('');
   const [occasion, setOccasion] = useState<string>('');
   const [recipientName, setRecipientName] = useState('');
   const [recipientWhatsapp, setRecipientWhatsapp] = useState('');
@@ -37,6 +39,7 @@ export default function Form() {
   const [linkCopied, setLinkCopied] = useState(false);
   const submitTimers = useRef<number[]>([]);
   const navigate = useNavigate();
+  const addExperience = useExperiences((state) => state.addExperience);
 
   useEffect(() => () => {
     submitTimers.current.forEach((timer) => window.clearTimeout(timer));
@@ -59,7 +62,8 @@ export default function Form() {
     if (isSubmitting) return;
 
     const shareCode = Math.random().toString(36).slice(2, 8);
-    setShareUrl(`${window.location.origin}/?experience=${shareCode}`);
+    const experienceUrl = `${window.location.origin}/?experience=${shareCode}`;
+    setShareUrl(experienceUrl);
     setLinkCopied(false);
     setShowExperiencePreview(false);
     setIsLoadingExiting(false);
@@ -70,6 +74,17 @@ export default function Form() {
     }, 1700));
 
     submitTimers.current.push(window.setTimeout(() => {
+      addExperience({
+        id: shareCode,
+        creatorName,
+        recipientName,
+        occasion,
+        heartfeltMessage,
+        selectedColor,
+        themeMode,
+        shareUrl: experienceUrl,
+        createdAt: new Date().toISOString(),
+      });
       setIsSubmitting(false);
       setIsLoadingExiting(false);
       setShowSuccessModal(true);
@@ -89,6 +104,7 @@ export default function Form() {
     setShowSuccessModal(false);
     setShowExperiencePreview(false);
     setActiveStep(1);
+    setCreatorName('');
     setOccasion('');
     setRecipientName('');
     setRecipientWhatsapp('');
@@ -155,7 +171,12 @@ export default function Form() {
             <section className="workspace-form-body-panel">
               {activeStep === 1 && (
                 <div className="step-form-fade-in">
-                  <InputField label="Full Name" multiline={false} />
+                  <InputField
+                    label="Full Name"
+                    multiline={false}
+                    value={creatorName}
+                    onChange={(event) => setCreatorName(event.target.value)}
+                  />
                   
                   {/* Select Occasion Input Field Dropdown */}
                   <div className="dropdown-select-container">
