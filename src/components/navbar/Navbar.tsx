@@ -12,8 +12,7 @@ interface NavbarProps {
 
 function Navbar({ type = 'unauthenticated', variant = 'light' }: NavbarProps) {
 
-   const authenticated = useAuth((state) => state.authenticated);
-  const setAuthenticated = useAuth((state) => state.setAuthenticated);
+  const authenticated = useAuth((state) => state.authenticated);
   const [isMobile, setIsMobile] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false); // Controls mobile dropdown visibility
   const navigate = useNavigate();
@@ -32,14 +31,9 @@ function Navbar({ type = 'unauthenticated', variant = 'light' }: NavbarProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleClick =()=>{
-    if(!authenticated){
-    navigate('/login');
-  }else{
-    navigate('./form')
-  }
-
-  }
+  const handleClick = () => {
+    navigate(authenticated ? '/form' : '/login');
+  };
 
   return (
     <nav className={`navbar navbar-${variant}`}>
@@ -70,9 +64,14 @@ function Navbar({ type = 'unauthenticated', variant = 'light' }: NavbarProps) {
         <button className="btn-primary" onClick={handleClick}>Create Experience</button>
         
         {type === 'authenticated' && (
-          <div className="navbar-profile">
+          <button
+            type="button"
+            className="navbar-profile"
+            onClick={() => navigate('/dashboard')}
+            aria-label="Open your dashboard"
+          >
             <img src={profileLogo} alt="Profile" className="navbar-profile-image" />
-          </div>
+          </button>
         )}
       </div>
     </nav>

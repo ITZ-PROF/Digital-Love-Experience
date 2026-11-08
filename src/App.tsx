@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import Login from './pages/auth/login';
 import Form from './pages/form/form';
 import BirthdayTemplate1 from './components/templates/birthdaytemplate1/BirthdayTemplate1';
+import Dashboard from './pages/dashboard/Dashboard';
 
 function Applive() {
   const [transitioning, setTransitioning] = useState(false);
@@ -58,6 +59,7 @@ function Applive() {
               </div>
             } 
           />
+          <Route path="/dashboard" element={<Dashboard />} />
           
           {/* Dedicated Authentication Route */}
           <Route path="/login" element={<Login />} />
