@@ -1,4 +1,7 @@
 import './birthdayTemplate1.css';
+import confettiArt from '../../../assets/confetti.png';
+import templateImage from '../../../assets/templateimage.svg';
+import {useNavigate} from 'react-router-dom';
 
 export interface BirthdayTemplateData {
   recipientName: string;
@@ -9,6 +12,7 @@ export interface BirthdayTemplateData {
   heroImageUrl: string;
   heroImageAlt: string;
   letterDate: string;
+  letterDateIso: string;
   letterGreeting: string;
   letterParagraphs: string[];
   letterSignoff: string;
@@ -16,9 +20,8 @@ export interface BirthdayTemplateData {
   quoteText: string;
   quoteAuthor: string;
   closingTitle: string;
-  closingDescription: string;
   buttonLabel: string;
-  copyright: string;
+  copyright: string[];
 }
 
 export interface BirthdayTemplateProps {
@@ -27,39 +30,41 @@ export interface BirthdayTemplateProps {
   onCreateExperience?: () => void;
 }
 
+const SAMPLE_DATA: BirthdayTemplateData = {
+  recipientName: 'Eleanor',
+  senderName: 'Thomas',
+  occasionLabel: 'CELEBRATING THIRTY YEARS',
+  title: 'Happy Birthday, Eleanor!',
+  summary:
+    'Today we celebrate the light you bring into our lives. This page is a small collection of thoughts, memories, and appreciation for the beautiful soul you are. May this year be your most wonderful journey yet.',
+  heroImageUrl: templateImage,
+  heroImageAlt: 'Colorful illustration of a birthday cake and gifts',
+  letterDate: 'March 20th, 2026',
+  letterDateIso: '2026-03-20',
+  letterGreeting: 'My Dearest Eleanor,',
+  letterParagraphs: [
+    'On this special day, I want you to know how much you mean to everyone around you. Your smile lights up every room, and your kindness touches every heart. Wishing you all the joy, love, and happiness you deserve today and always.',
+    'Watching you grow, achieve your dreams, and navigate the world with such grace has been the greatest privilege of my life. You inspire me to be better every single day.',
+  ],
+  letterSignoff: 'With all my love and admiration,',
+  quoteNumber: '66',
+  quoteText: 'The more you praise and celebrate your life, the more there is in life to celebrate.',
+  quoteAuthor: 'Oprah Winfrey',
+  closingTitle: 'Create a custom digital memory book and celebration space for the people you love.',
+  buttonLabel: 'Create Experience',
+  copyright: [
+    'Made with love for Eleanor’s 30th Birthday.',
+    '© 2026 Celebration Space. All rights reserved.',
+  ],
+};
+
+
+
 function BirthdayTemplate1({
   className = '',
-  heroImageUrl,
+  heroImageUrl = SAMPLE_DATA.heroImageUrl,
   onCreateExperience,
 }: BirthdayTemplateProps) {
-  const sample: BirthdayTemplateData = {
-    recipientName: 'Eleanor',
-    senderName: 'Thomas',
-    occasionLabel: 'CELEBRATING THIRTY YEARS',
-    title: 'Happy Birthday, Eleanor!',
-    summary:
-      'A little place on the internet for all the memories, laughter, and love you bring into our lives.',
-    heroImageUrl:
-      'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=85&w=1800&auto=format&fit=crop',
-    heroImageAlt: 'A joyful birthday celebration with warm lights and decorations',
-    letterDate: 'March 20th, 2026',
-    letterGreeting: 'To my wonderful Eleanor,',
-    letterParagraphs: [
-      'Thirty years of you—and somehow the world still gets brighter every time you walk into a room. Your kindness has a way of making ordinary days feel like something worth remembering.',
-      'I hope this next chapter brings you new places to explore, big reasons to laugh, and all the small, beautiful moments you give so freely to everyone around you. You deserve every bit of joy coming your way.',
-      'Thank you for being exactly who you are. I feel lucky to celebrate you today, and even luckier to have you in my life.',
-    ],
-    letterSignoff: 'With all my love, Thomas',
-    quoteNumber: '66',
-    quoteText: 'The more you praise and celebrate your life, the more there is in life to celebrate.',
-    quoteAuthor: 'Oprah Winfrey',
-    closingTitle: 'Here’s to your next beautiful chapter.',
-    closingDescription:
-      'Keep this little corner of the internet close, and come back whenever you need a reminder of how loved you are.',
-    buttonLabel: 'Create your own experience',
-    copyright: '© 2026 Digital Love Experience · Made with love for Eleanor',
-  };
-
   const {
     recipientName,
     senderName,
@@ -68,6 +73,7 @@ function BirthdayTemplate1({
     summary,
     heroImageAlt,
     letterDate,
+    letterDateIso,
     letterGreeting,
     letterParagraphs,
     letterSignoff,
@@ -75,15 +81,18 @@ function BirthdayTemplate1({
     quoteText,
     quoteAuthor,
     closingTitle,
-    closingDescription,
     buttonLabel,
     copyright,
-  } = sample;
-  const imageUrl = heroImageUrl || sample.heroImageUrl;
+  } = SAMPLE_DATA;
+  const senderInitial = senderName.charAt(0);
+
+  const navigate = useNavigate();
 
   return (
     <main className={`birthday-template-container ${className}`.trim()}>
       <section className="hero-section" id="top" aria-labelledby="birthday-title">
+        <img className="hero-template-art" src={confettiArt} alt="" aria-hidden="true" />
+
         <div className="hero-copy">
           <p className="hero-eyebrow">
             <span className="eyebrow-line" aria-hidden="true" />
@@ -91,8 +100,10 @@ function BirthdayTemplate1({
           </p>
           <h1 id="birthday-title">{title}</h1>
           <p className="hero-byline">
-            <span className="byline-heart" aria-hidden="true">♥</span>
-            A birthday note from <strong>{senderName}</strong>
+            <span className="byline-initial" aria-hidden="true">{senderInitial}</span>
+            <span>
+              With all my love, <strong>{senderName}</strong>
+            </span>
           </p>
           <p className="hero-summary">{summary}</p>
           <a className="scroll-prompt" href="#birthday-letter">
@@ -100,59 +111,65 @@ function BirthdayTemplate1({
           </a>
         </div>
 
-        <div className="hero-visual">
-          <div className="hero-image-frame">
-            <img src={imageUrl} alt={heroImageAlt} />
-            <span className="image-caption">A day all about you</span>
-          </div>
-          <span className="hero-sparkle sparkle-one" aria-hidden="true">✳</span>
-          <span className="hero-sparkle sparkle-two" aria-hidden="true">✦</span>
-          <span className="hero-stamp" aria-hidden="true">THIRTY<br />& THRIVING</span>
-        </div>
+        <img
+          className="hero-image-frame"
+          src={heroImageUrl}
+          alt={heroImageAlt}
+        />
       </section>
 
       <section className="letter-section" id="birthday-letter" aria-label={`A birthday letter for ${recipientName}`}>
-        <span className="letter-decoration decoration-left" aria-hidden="true">✳</span>
-        <span className="letter-decoration decoration-right" aria-hidden="true">✦</span>
         <article className="letter-card">
           <header className="letter-meta">
-            <span className="recipient-label">A NOTE FOR {recipientName}</span>
-            <time dateTime="2026-03-20">{letterDate}</time>
+            <span className="letter-greeting">
+              <span className="letter-initial" aria-hidden="true">{senderInitial}</span>
+              {letterGreeting}
+            </span>
+            <time dateTime={letterDateIso}>{letterDate}</time>
           </header>
-          <div className="letter-rule" aria-hidden="true"><span>♥</span></div>
           <div className="letter-content">
-            <p className="letter-greeting">{letterGreeting}</p>
-            {letterParagraphs.map((paragraph, index) => (
-              <p key={`${index}-${paragraph.slice(0, 12)}`}>{paragraph}</p>
+            {letterParagraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
             ))}
-            <p className="letter-signoff">{letterSignoff}</p>
-            <span className="letter-signature" aria-hidden="true">T</span>
+            <p className="letter-signoff">
+              {letterSignoff}
+              <strong>{senderName}</strong>
+            </p>
           </div>
         </article>
       </section>
 
       <section className="quote-section" aria-labelledby="birthday-quote">
         <p className="quote-index">{quoteNumber}</p>
-        <span className="quote-mark" aria-hidden="true">“</span>
         <blockquote id="birthday-quote">
-          <p>{quoteText}</p>
+          <p>&quot;{quoteText}&quot;</p>
           <footer className="quote-attribution">
             <span aria-hidden="true" />
-            <cite>— {quoteAuthor} —</cite>
+            <cite>{quoteAuthor}</cite>
             <span aria-hidden="true" />
           </footer>
         </blockquote>
       </section>
 
-      <footer className="birthday-footer">
-        <div className="footer-flourish" aria-hidden="true">✳ &nbsp; ♥ &nbsp; ✳</div>
-        <p className="footer-kicker">A LITTLE MORE LOVE, ALWAYS</p>
+      <section className="birthday-footer">
+        <p className="footer-kicker">Want to surprise someone special?</p>
         <h2>{closingTitle}</h2>
-        <p className="footer-description">{closingDescription}</p>
-        <button className="btn-primary" type="button" onClick={onCreateExperience}>
-          {buttonLabel}<span aria-hidden="true">↗</span>
+        <button className="btn-primary" type="button" onClick={() => {
+          if (onCreateExperience) {
+            onCreateExperience();
+          } else {
+            navigate('/form');
+          }}}>
+          {buttonLabel}
         </button>
-        <p className="footer-copyright">{copyright}</p>
+      </section>
+
+      <footer className="birthday-copyright">
+        {copyright.map((line) => (
+          <p key={line} className="footer-copyright">
+            {line}
+          </p>
+        ))}
       </footer>
     </main>
   );
