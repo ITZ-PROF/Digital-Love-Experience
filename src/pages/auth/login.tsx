@@ -59,21 +59,29 @@ export default function Login(){
                 {!isExistingUser ? (
                     <>
                         <InputField label='Full Name' multiline={false}/>
-                        <InputField label='Phone Number' multiline={false}/>
+                        <InputField label='Email' multiline={false}/>
+                        <InputField label='Password' multiline={false}/>
                         {verify && <InputField label='Verification Code' multiline={false}/>}
                     </>
                 ) : (
                     <>
-                        <InputField label='Phone Number' multiline={false}/>
+                        <InputField label='Email' multiline={false}/>
+                        <InputField label='Password' multiline={false}/>
                         {verify && <InputField label='Verification Code' multiline={false}/>}
                     </>
                 )}
                 
                 {/* Adaptive CTA Action Button text */}
-                <button className='verify-btn' onClick={!verify ? () => setVerify(true) : verifyAuth}>
-                   {verify 
+                <button className='verify-btn' 
+                    //  onClick={!verify ? () => setVerify(true) : verifyAuth}
+                    onClick={verifyAuth }
+                >
+                   {/* {verify 
                        ? (isExistingUser ? 'Enter Room' : 'Create Room') 
                        : 'Verify'
+                   } */}
+                   {
+                     isExistingUser ? 'Enter Room' : 'Create Room'
                    }
                 </button>
                 
