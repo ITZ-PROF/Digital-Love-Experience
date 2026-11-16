@@ -7,6 +7,7 @@ import Login from './pages/auth/login';
 import Form from './pages/form/form';
 import BirthdayTemplate1 from './components/templates/birthdaytemplate1/BirthdayTemplate1';
 import Dashboard from './pages/dashboard/Dashboard';
+import {QueryClient,QueryClientProvider} from '@tanstack/react-query'
 
 function Applive() {
   const [transitioning, setTransitioning] = useState(false);
@@ -26,7 +27,10 @@ function Applive() {
     };
   }, []);
 
+  const queryClient = new QueryClient();
+
   return (
+    <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <div className="App">
         {/* The Loader handles initial page mount presentation */}
@@ -66,6 +70,7 @@ function Applive() {
         </Routes>
       </div>
     </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 

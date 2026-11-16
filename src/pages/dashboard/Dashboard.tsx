@@ -4,12 +4,14 @@ import LoadingPage from '../../components/loadingpage/loader';
 import { useAuth } from '../../stores/authstore';
 import { Experience, useExperiences } from '../../stores/experiencesStore';
 import './dashboard.css';
+import {useLogout} from '../../hooks/use-auth';
 
 function ExperienceCard({ experience }: { experience: Experience }) {
   const occasion = experience.occasion
     ? experience.occasion.charAt(0).toUpperCase() + experience.occasion.slice(1)
     : 'Special moment';
 
+    
   return (
     <article
       className={`experience-card experience-card-${experience.selectedColor} experience-card-${experience.themeMode}`}
@@ -39,10 +41,12 @@ function ExperienceCard({ experience }: { experience: Experience }) {
 
 export default function Dashboard() {
   const authenticated = useAuth((state) => state.authenticated);
-  const setAuthenticated = useAuth((state) => state.setAuthenticated);
+  // const setAuthenticated = useAuth((state) => state.setAuthenticated);
   const experiences = useExperiences((state) => state.experiences);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+
+  const { mutate, isError } = useLogout();
 
   useEffect(() => {
     const timer = window.setTimeout(() => setLoading(false), 350);
@@ -52,7 +56,7 @@ export default function Dashboard() {
   if (!authenticated) return <Navigate to="/login" replace />;
 
   const handleLogout = () => {
-    setAuthenticated(false);
+    mutate();
     navigate('/');
   };
 
