@@ -13,6 +13,6 @@ export const useAuth = create<AuthInterface>()(
         authenticated: false,
         setAuthenticated: (value: boolean) => set(() => ({ authenticated: value }))
     }), {
-        name: 'auth'
+        name: 'auth',
     })
     )

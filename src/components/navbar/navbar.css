@@ -86,7 +86,9 @@
     align-items: center;
     padding: 10px; /* Reduced from 20px to prevent overflow in a 60px high navbar */
     background-color: var(--primary);
+    border: 0;
     border-radius: var(--radius-full);
+    cursor: pointer;
     transition: opacity 0.3s ease;
 }
 

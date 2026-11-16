@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../stores/authstore';
 import { useNavigate } from 'react-router-dom';
 import LoadingPage from '../../components/loadingpage/loader'; // 1. Import your loader component
+import { useLogin, useRegister } from '../../hooks/use-auth';
+
 
 export default function Login(){
     const navigate = useNavigate();
@@ -16,6 +18,26 @@ export default function Login(){
     const [isExiting, setIsExiting] = useState(false); // 2. State to handle the 700ms smooth fade out
     const [isExistingUser, setIsExistingUser] = useState(false);
     const [verify, setVerify] = useState(false);
+    const [fullName, setFullName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError]= useState('')
+
+
+    const { 
+        mutate: signUpMutate, 
+        isPending: signUpPending, 
+        error: signUpError, 
+        isError: signUpIsError
+     } = useRegister();
+
+
+    const { 
+        mutate: loginMutate, 
+        isPending: loginPending, 
+        error: loginError, 
+        isError: loginIsError
+     } = useLogin();
 
     // Handles layout toggling and resets steps to step 
     const handleFormToggle = (e: any, isExisting: boolean) => {
@@ -25,21 +47,60 @@ export default function Login(){
     };
 
     // 3. Form Submission Action (Triggers when final code is verified)
-    const verifyAuth = () => {
-        setLoading(true); // Open the loader modal overlay immediately
-        setIsExiting(false);
+    const verifySignUp = () => {
 
-        // Simulate an API network request look-up
-        setTimeout(() => {
+    
+       setLoading(true); // Show loader immediately on button click
+      signUpMutate({
+            fullName,
+            email,
+            password
+        });
+
+        if(signUpPending) {
+            setLoading(true); // Show loader while waiting for the mutation to complete
+            setIsExiting(false); // Reset exit state for the loader
+        }else if(signUpIsError) {
+            setLoading(false);
+            setError(signUpError.message)
+            console.error('Error during authentication:', signUpError);
+        }
+         setTimeout(() => {
+          setLoading(false);
+            setIsExiting(true); // Trigger exit animation
             setAuthenticated(true); // Update Zustand global state
-            setIsExiting(true);     // Start the 700ms CSS fade-out transition
+         
+            navigate('/')
+        
+        }, 2000);
 
-            // Wait for the fade out animation to finish before moving pages
-            setTimeout(() => {
-                setLoading(false);
-                navigate('/');
-            }, 700); // Matches your CSS fade animation duration
-        }, 2300); // Combined with 700ms fade makes a perfect 3-second process
+    };
+    const verifyLogin = () => {
+
+    
+       setLoading(true); // Show loader immediately on button click
+      loginMutate({
+            email,
+            password
+        });
+
+        if(loginPending) {
+            setLoading(true); // Show loader while waiting for the mutation to complete
+            setIsExiting(false); // Reset exit state for the loader
+        }else if(loginIsError) {
+            setLoading(false);
+            setError(loginError.message)
+            console.error('Error during authentication:', loginError);
+        }
+         setTimeout(() => {
+          setLoading(false);
+            setIsExiting(true); // Trigger exit animation
+            setAuthenticated(true); // Update Zustand global state
+         
+            navigate('/')
+        
+        }, 2000);
+
     };
 
     return(
@@ -58,24 +119,40 @@ export default function Login(){
                 {/* Condition-Driven Dynamic Input Fields */}
                 {!isExistingUser ? (
                     <>
-                        <InputField label='Full Name' multiline={false}/>
-                        <InputField label='Phone Number' multiline={false}/>
+                        <InputField label='Full Name' multiline={false}
+                         value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                        <InputField label='Email' multiline={false} 
+                         value={email} onChange={(e) => setEmail(e.target.value)} />
+                        <InputField label='Password' multiline={false}
+                        value={password} onChange={(e) => setPassword(e.target.value)} />
                         {verify && <InputField label='Verification Code' multiline={false}/>}
                     </>
                 ) : (
                     <>
-                        <InputField label='Phone Number' multiline={false}/>
+                        <InputField label='Email' multiline={false}
+                        value={email} onChange={(e) => setEmail(e.target.value)} />
+                        <InputField label='Password' multiline={false}
+                        value={password} onChange={(e) => setPassword(e.target.value)} />
                         {verify && <InputField label='Verification Code' multiline={false}/>}
                     </>
                 )}
                 
                 {/* Adaptive CTA Action Button text */}
-                <button className='verify-btn' onClick={!verify ? () => setVerify(true) : verifyAuth}>
-                   {verify 
+                <button className='verify-btn' 
+                    //  onClick={!verify ? () => setVerify(true) : verifyAuth}
+                    onClick={isExistingUser ? verifyLogin : verifySignUp}
+                >
+                   {/* {verify 
                        ? (isExistingUser ? 'Enter Room' : 'Create Room') 
                        : 'Verify'
+                   } */}
+                   {
+                     isExistingUser ? 'Enter Room' : 'Create Room'
                    }
                 </button>
+                {
+                    error && <p className='error-message'>Error: {error}</p>
+                }
                 
                 {/* Adaptive Navigation Footer Link options */}
                 <p className='login-action'>
