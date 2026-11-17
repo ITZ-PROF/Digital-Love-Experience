@@ -1,200 +1,257 @@
+import axios from 'axios';
+import { FormEvent, useState } from 'react';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import './auth.css';
 import InputField from '../../components/inputfield/input';
 import authImg from '../../assets/authimage.svg';
 import fulllogo from '../../assets/full-logo.svg';
-import { useEffect, useState } from 'react';
-import { useAuth } from '../../stores/authstore';
-import { useNavigate } from 'react-router-dom';
-import LoadingPage from '../../components/loadingpage/loader'; // 1. Import your loader component
+import LoadingPage from '../../components/loadingpage/loader';
 import { useLogin, useRegister } from '../../hooks/use-auth';
+import { requestPasswordReset, resendVerificationEmail } from '../../services/auth.service';
+import { useAuth } from '../../stores/authstore';
 
+type Feedback = { type: 'error' | 'success'; message: string };
+type LoginLocationState = { from?: { pathname?: string } };
 
-export default function Login(){
+const getApiErrorMessage = (error: unknown, fallback: string) => {
+    if (axios.isAxiosError<{ message?: string }>(error)) {
+        return error.response?.data?.message || error.message || fallback;
+    }
+    return fallback;
+};
+
+export default function Login() {
     const navigate = useNavigate();
-    const authenticated = useAuth((state) => state.authenticated);
-    const setAuthenticated = useAuth((state) => state.setAuthenticated);
-    
-    const [loading, setLoading] = useState(false);
-    const [isExiting, setIsExiting] = useState(false); // 2. State to handle the 700ms smooth fade out
+    const location = useLocation();
+    const authStatus = useAuth((state) => state.status);
+    const destination = (location.state as LoginLocationState | null)?.from?.pathname || '/form';
     const [isExistingUser, setIsExistingUser] = useState(false);
-    const [verify, setVerify] = useState(false);
+    const [isResetting, setIsResetting] = useState(false);
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError]= useState('');
+    const [feedback, setFeedback] = useState<Feedback | null>(null);
+    const [canResendVerification, setCanResendVerification] = useState(false);
+    const [recoveryPending, setRecoveryPending] = useState(false);
+    const { mutate: loginMutate, isPending: loginPending } = useLogin();
+    const { mutate: registerMutate, isPending: registerPending } = useRegister();
+    const isPending = loginPending || registerPending || recoveryPending || authStatus === 'checking';
 
-    const validateFields = () => {
-        if (isExistingUser) {
-            if (!email.trim() ) {
-                setError('Email field cannot be empty');
-                return false;
-            }
-            if (!password.trim()) {
-                setError('Password Field cannot be empty');
+    if (authStatus === 'authenticated') {
+        return <Navigate to="/form" replace />;
+    }
+
+    const validate = () => {
+        if (isResetting) {
+            if (!email.trim()) {
+                setFeedback({ type: 'error', message: 'Enter the email address for your account.' });
                 return false;
             }
         } else {
-            if (!fullName.trim() || !email.trim() || !password.trim()) {
-                setError('Please fill in all fields');
+            if (!isExistingUser && !fullName.trim()) {
+                setFeedback({ type: 'error', message: 'Enter your full name.' });
+                return false;
+            }
+            if (!email.trim()) {
+                setFeedback({ type: 'error', message: 'Enter your email address.' });
+                return false;
+            }
+            if (!isResetting && !password) {
+                setFeedback({ type: 'error', message: 'Enter your password.' });
+                return false;
+            }
+            if (!isExistingUser && !isResetting && password.length < 12) {
+                setFeedback({ type: 'error', message: 'Use a password with at least 12 characters.' });
                 return false;
             }
         }
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            setError('Please enter a valid email address');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+            setFeedback({ type: 'error', message: 'Enter a valid email address.' });
             return false;
         }
 
-        setError('');
+        setFeedback(null);
+        setCanResendVerification(false);
         return true;
     };
 
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        if (!validate()) return;
 
-    const { 
-        mutate: signUpMutate, 
-        isPending: signUpPending, 
-        error: signUpError, 
-        isError: signUpIsError
-     } = useRegister();
+        const normalizedEmail = email.trim().toLowerCase();
+        if (isResetting) {
+            setRecoveryPending(true);
+            requestPasswordReset(normalizedEmail)
+                .then((response) => setFeedback({ type: 'success', message: response.message }))
+                .catch((error: unknown) => setFeedback({
+                    type: 'error',
+                    message: getApiErrorMessage(error, 'We could not request a password reset. Please try again.'),
+                }))
+                .finally(() => setRecoveryPending(false));
+            return;
+        }
 
-
-    const { 
-        mutate: loginMutate, 
-        isPending: loginPending, 
-        error: loginError, 
-        isError: loginIsError
-     } = useLogin();
-
-    // Handles layout toggling and resets steps to step 
-    const handleFormToggle = (e: any, isExisting: boolean) => {
-        e.preventDefault(); 
-        setIsExistingUser(isExisting);
-        setVerify(false); 
-    };
-
-    // 3. Form Submission Action (Triggers when final code is verified)
-    const verifySignUp = () => {
-        if (!validateFields()) return;
-
-       setLoading(true); // Show loader immediately on button click
-        signUpMutate({
-            fullName,
-            email,
-            password
-        }, {
-            onSuccess: () => {
-                setTimeout(() => {
-                    setLoading(false);
-                    setIsExiting(true);
-                    setAuthenticated(true);
-                    navigate('/');
-                }, 2000);
-            },
-            onError: (err: any) => {
-                setLoading(false);
-                setError(err.response?.data?.message);
-                console.error('Error during sign up:', err);
-            }
-        });
-    };
-
-    const verifyLogin = () => {
-        if (!validateFields()) return;
-
-       setLoading(true); // Show loader immediately on button click
-      loginMutate({
-            email,
-            password
-        }, {
-            onSuccess: () => {
-                setTimeout(() => {
-                    setLoading(false);
-                    setIsExiting(true);
-                    setAuthenticated(true);
-                    navigate('/');
-                }, 2000);
-            },
-            onError: (err: any) => {
-                setLoading(false);
-                setError(err.response?.data?.message || err.message || 'An error occurred during login');
-            }
-        });
-    };
-
-    return(
-        <div className='authPage'>
-            {/* 4. Mount your Loader as a top-layer Modal Overlay */}
-            <LoadingPage isModal={true} isOpen={loading} isExiting={isExiting} />
-
-            <div className='authpage-left'>
-                <img src={fulllogo} alt="logo" className="auth-logo" /> 
-                
-                {/* Dynamic Header Prompts */}
-                <p className='prompt'>
-                    {isExistingUser ? 'Enter Your Experience Room' : 'Build Your Experience Room'}
-                </p>
-                
-                {/* Condition-Driven Dynamic Input Fields */}
-                {!isExistingUser ? (
-                    <>
-                        <InputField label='Full Name' multiline={false}
-                         value={fullName} onChange={(e) => setFullName(e.target.value)} />
-                        <InputField label='Email' multiline={false} 
-                         value={email} onChange={(e) => setEmail(e.target.value)} />
-                        <InputField label='Password' multiline={false}
-                        value={password} onChange={(e) => setPassword(e.target.value)} />
-                        {verify && <InputField label='Verification Code' multiline={false}/>}
-                    </>
-                ) : (
-                    <>
-                        <InputField label='Email' multiline={false}
-                        value={email} onChange={(e) => setEmail(e.target.value)} />
-                        <InputField label='Password' multiline={false}
-                        value={password} onChange={(e) => setPassword(e.target.value)} />
-                        {verify && <InputField label='Verification Code' multiline={false}/>}
-                    </>
-                )}
-                
-                {/* Adaptive CTA Action Button text */}
-                <button className='verify-btn' 
-                    //  onClick={!verify ? () => setVerify(true) : verifyAuth}
-                    onClick={isExistingUser? verifyLogin : verifySignUp}
-                >
-                   {/* {verify 
-                       ? (isExistingUser ? 'Enter Room' : 'Create Room') 
-                       : 'Verify'
-                   } */}
-                   {
-                     isExistingUser ? 'Enter Room' : 'Create Room'
-                   }
-                </button>
+        if (!isExistingUser) {
+            registerMutate(
+                { fullName: fullName.trim(), email: normalizedEmail, password },
                 {
-                    error && <p className='error-message'>{error}</p>
+                    onSuccess: (response) => setFeedback({ type: 'success', message: response.message }),
+                    onError: (error) => setFeedback({
+                        type: 'error',
+                        message: getApiErrorMessage(error, 'We could not create your account. Please try again.'),
+                    }),
                 }
-                
-                {/* Adaptive Navigation Footer Link options */}
-                <p className='login-action'>
-                    {isExistingUser ? (
-                        <>
-                            Need a new space?{' '}
-                            <a className='login-link' href='/' onClick={(e) => handleFormToggle(e, false)}>
-                                Build Room
-                            </a>
-                        </>
+            );
+            return;
+        }
+
+        loginMutate(
+            { email: normalizedEmail, password },
+            {
+                onSuccess: () => navigate(destination, { replace: true }),
+                onError: (error) => {
+                    const isUnverified = axios.isAxiosError<{ code?: string }>(error)
+                        && error.response?.data?.code === 'EMAIL_NOT_VERIFIED';
+                    setCanResendVerification(isUnverified);
+                    setFeedback({
+                        type: 'error',
+                        message: getApiErrorMessage(error, 'We could not sign you in. Please try again.'),
+                    });
+                },
+            }
+        );
+    };
+
+    const handleResendVerification = async () => {
+        setRecoveryPending(true);
+        try {
+            const response = await resendVerificationEmail(email.trim().toLowerCase());
+            setFeedback({ type: 'success', message: response.message });
+            setCanResendVerification(false);
+        } catch (error) {
+            setFeedback({
+                type: 'error',
+                message: getApiErrorMessage(error, 'We could not resend the verification email. Please try again.'),
+            });
+        } finally {
+            setRecoveryPending(false);
+        }
+    };
+
+    const switchMode = (existing: boolean) => {
+        setIsExistingUser(existing);
+        setIsResetting(false);
+        setFeedback(null);
+        setCanResendVerification(false);
+    };
+
+    return (
+        <div className="authPage">
+            <LoadingPage isModal isOpen={isPending} />
+
+            <div className="authpage-left">
+                <Link to="/" aria-label="Digital Love Experience home">
+                    <img src={fulllogo} alt="Digital Love Experience" className="auth-logo" />
+                </Link>
+
+                <p className="prompt">
+                    {isResetting
+                        ? 'Reset Your Password'
+                        : isExistingUser
+                            ? 'Sign In to Your Creator Account'
+                            : 'Create Your Creator Account'}
+                </p>
+                <p className="auth-description">A creator account is required to build and manage experiences. Recipients do not need an account.</p>
+
+                <form className="auth-form" onSubmit={handleSubmit} noValidate>
+                    {isResetting ? (
+                        <InputField
+                            label="Email"
+                            multiline={false}
+                            type="email"
+                            autoComplete="email"
+                            value={email}
+                            onChange={(event) => setEmail(event.target.value)}
+                        />
                     ) : (
                         <>
-                            Have an existing room?{' '}
-                            <a className='login-link' href='/' onClick={(e) => handleFormToggle(e, true)}>
-                                Enter Room
-                            </a>
+                            {!isExistingUser && (
+                                <InputField
+                                    label="Full Name"
+                                    multiline={false}
+                                    autoComplete="name"
+                                    value={fullName}
+                                    onChange={(event) => setFullName(event.target.value)}
+                                />
+                            )}
+                            <InputField
+                                label="Email"
+                                multiline={false}
+                                type="email"
+                                autoComplete="email"
+                                value={email}
+                                onChange={(event) => setEmail(event.target.value)}
+                            />
+                            <InputField
+                                label="Password"
+                                multiline={false}
+                                type="password"
+                                autoComplete={isExistingUser ? 'current-password' : 'new-password'}
+                                value={password}
+                                onChange={(event) => setPassword(event.target.value)}
+                            />
+                        </>
+                    )}
+
+                    {feedback && (
+                        <p className={`auth-feedback auth-feedback--${feedback.type}`} role={feedback.type === 'error' ? 'alert' : 'status'}>
+                            {feedback.message}
+                        </p>
+                    )}
+                    {canResendVerification && (
+                        <button type="button" className="login-link" onClick={handleResendVerification} disabled={recoveryPending}>
+                            Resend verification email
+                        </button>
+                    )}
+
+                    <button className="verify-btn" type="submit" disabled={isPending}>
+                        {isResetting ? 'Send Reset Link' : isExistingUser ? 'Sign In' : 'Create Account'}
+                    </button>
+                </form>
+
+                {isExistingUser && !isResetting && (
+                    <button type="button" className="login-link auth-secondary-action" onClick={() => {
+                        setIsResetting(true);
+                        setFeedback(null);
+                    }}>
+                        Forgot your password?
+                    </button>
+                )}
+
+                <p className="login-action">
+                    {isResetting ? (
+                        <button type="button" className="login-link" onClick={() => {
+                            setIsResetting(false);
+                            setFeedback(null);
+                        }}>
+                            Return to sign in
+                        </button>
+                    ) : isExistingUser ? (
+                        <>Need a creator account?{' '}
+                            <button type="button" className="login-link" onClick={() => switchMode(false)}>Create account</button>
+                        </>
+                    ) : (
+                        <>Already have an account?{' '}
+                            <button type="button" className="login-link" onClick={() => switchMode(true)}>Sign in</button>
                         </>
                     )}
                 </p>
             </div>
-            
-            <div className='authpage-right'>
-                <img src={authImg} alt="authimg" className='authImage' />
+
+            <div className="authpage-right">
+                <img src={authImg} alt="" className="authImage" />
             </div>
         </div>
     );

@@ -1,18 +1,20 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { AuthUser } from '../types/types';
 
-// 1. Define the complete shape of your store's state and actions
-interface AuthInterface {
-    authenticated: boolean;
-    setAuthenticated: (value: boolean) => void; // Declare function signature
+type AuthStatus = 'checking' | 'authenticated' | 'unauthenticated' | 'unavailable';
+
+interface AuthState {
+  status: AuthStatus;
+  user: AuthUser | null;
+  setAuthenticated: (user: AuthUser) => void;
+  setUnauthenticated: () => void;
+  setUnavailable: () => void;
 }
 
-export const useAuth = create<AuthInterface>()(
-    persist(
-        (set) => ({
-        authenticated: false,
-        setAuthenticated: (value: boolean) => set(() => ({ authenticated: value }))
-    }), {
-        name: 'auth',
-    })
-    )
+export const useAuth = create<AuthState>((set) => ({
+  status: 'checking',
+  user: null,
+  setAuthenticated: (user) => set({ status: 'authenticated', user }),
+  setUnauthenticated: () => set({ status: 'unauthenticated', user: null }),
+  setUnavailable: () => set({ status: 'unavailable', user: null }),
+}));

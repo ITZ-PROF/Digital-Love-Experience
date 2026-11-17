@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import './input.css';
 
 
@@ -8,10 +8,13 @@ interface inputProps {
     rows?: number;
     value?: string;
     onChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    type?: React.HTMLInputTypeAttribute;
+    autoComplete?: string;
 }
 
 
-const InputField = ({ label, multiline, rows = 4, value, onChange } : inputProps) => {
+const InputField = ({ label, multiline, rows = 4, value, onChange, type = 'text', autoComplete } : inputProps) => {
+  const fieldId = useId();
   const [isFocused, setIsFocused] = useState(false);
   const [internalValue, setInternalValue] = useState('');
 
@@ -30,6 +33,7 @@ const InputField = ({ label, multiline, rows = 4, value, onChange } : inputProps
     <div className={`input-container ${multiline ? 'multiline' : ''}`}>
       {multiline ? (
         <textarea
+          id={fieldId}
           className="custom-field"
           value={currentValue}
           onChange={handleChange}
@@ -39,16 +43,18 @@ const InputField = ({ label, multiline, rows = 4, value, onChange } : inputProps
         />
       ) : (
         <input
-          type="text"
+          id={fieldId}
+          type={type}
           className="custom-field"
           value={currentValue}
           onChange={handleChange}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          autoComplete={autoComplete}
         />
       )}
       
-      <label className={`custom-label ${isFloating ? 'floating' : ''}`}>
+      <label htmlFor={fieldId} className={`custom-label ${isFloating ? 'floating' : ''}`}>
         {label}
       </label>
     </div>

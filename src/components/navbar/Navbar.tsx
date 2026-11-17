@@ -6,13 +6,12 @@ import './navbar.css';
 import { useAuth } from '../../stores/authstore';
 
 interface NavbarProps {
-  type?: 'authenticated' | 'unauthenticated';
   variant?: 'light' | 'dark';
 }
 
-function Navbar({ type = 'unauthenticated', variant = 'light' }: NavbarProps) {
+function Navbar({ variant = 'light' }: NavbarProps) {
 
-  const authenticated = useAuth((state) => state.authenticated);
+  const authenticated = useAuth((state) => state.status === 'authenticated');
   const [isMobile, setIsMobile] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false); // Controls mobile dropdown visibility
   const navigate = useNavigate();
@@ -32,7 +31,7 @@ function Navbar({ type = 'unauthenticated', variant = 'light' }: NavbarProps) {
   }, []);
 
   const handleClick = () => {
-    navigate(authenticated ? '/form' : '/login');
+    navigate('/form');
   };
 
   return (
@@ -59,11 +58,11 @@ function Navbar({ type = 'unauthenticated', variant = 'light' }: NavbarProps) {
       <div className={`navbar-links ${isMobile ? 'mobile-menu' : ''} ${isMenuOpen ? 'show' : ''}`}>
         <Link to="/" className="navbar-link">Home</Link>
         <Link to="/birthday" className="navbar-link">Samples</Link>
-        <Link to="form" className="navbar-link">Pricing</Link>
+        <Link to="/form" className="navbar-link">Pricing</Link>
         <Link to="/form" className="navbar-link">Contact Us</Link>
         <button className="btn-primary" onClick={handleClick}>Create Experience</button>
         
-        {type === 'authenticated' && (
+        {authenticated && (
           <button
             type="button"
             className="navbar-profile"
