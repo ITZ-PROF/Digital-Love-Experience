@@ -1,4 +1,4 @@
-export default {
+const environment = {
     env: process.env.NODE_ENV || 'development',
 
     api: {
@@ -7,3 +7,5 @@ export default {
 
     version: '1.0.0'
 }
+
+export default environment
