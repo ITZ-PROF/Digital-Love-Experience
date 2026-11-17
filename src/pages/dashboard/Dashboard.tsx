@@ -41,7 +41,7 @@ function ExperienceCard({ experience }: { experience: Experience }) {
 
 export default function Dashboard() {
   const authenticated = useAuth((state) => state.authenticated);
-  // const setAuthenticated = useAuth((state) => state.setAuthenticated);
+  const setAuthenticated = useAuth((state) => state.setAuthenticated);
   const experiences = useExperiences((state) => state.experiences);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -53,7 +53,7 @@ export default function Dashboard() {
     return () => window.clearTimeout(timer);
   }, []);
 
-  if (!authenticated) return <Navigate to="/login" replace />;
+  if (!authenticated) return <Navigate to="/" replace />;
 
   const handleLogout = () => {
     mutate();

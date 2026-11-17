@@ -21,7 +21,34 @@ export default function Login(){
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError]= useState('')
+    const [error, setError]= useState('');
+
+    const validateFields = () => {
+        if (isExistingUser) {
+            if (!email.trim() ) {
+                setError('Email field cannot be empty');
+                return false;
+            }
+            if (!password.trim()) {
+                setError('Password Field cannot be empty');
+                return false;
+            }
+        } else {
+            if (!fullName.trim() || !email.trim() || !password.trim()) {
+                setError('Please fill in all fields');
+                return false;
+            }
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            setError('Please enter a valid email address');
+            return false;
+        }
+
+        setError('');
+        return true;
+    };
 
 
     const { 
@@ -48,59 +75,51 @@ export default function Login(){
 
     // 3. Form Submission Action (Triggers when final code is verified)
     const verifySignUp = () => {
+        if (!validateFields()) return;
 
-    
        setLoading(true); // Show loader immediately on button click
-      signUpMutate({
+        signUpMutate({
             fullName,
             email,
             password
+        }, {
+            onSuccess: () => {
+                setTimeout(() => {
+                    setLoading(false);
+                    setIsExiting(true);
+                    setAuthenticated(true);
+                    navigate('/');
+                }, 2000);
+            },
+            onError: (err: any) => {
+                setLoading(false);
+                setError(err.response?.data?.message);
+                console.error('Error during sign up:', err);
+            }
         });
-
-        if(signUpPending) {
-            setLoading(true); // Show loader while waiting for the mutation to complete
-            setIsExiting(false); // Reset exit state for the loader
-        }else if(signUpIsError) {
-            setLoading(false);
-            setError(signUpError.message)
-            console.error('Error during authentication:', signUpError);
-        }
-         setTimeout(() => {
-          setLoading(false);
-            setIsExiting(true); // Trigger exit animation
-            setAuthenticated(true); // Update Zustand global state
-         
-            navigate('/')
-        
-        }, 2000);
-
     };
-    const verifyLogin = () => {
 
-    
+    const verifyLogin = () => {
+        if (!validateFields()) return;
+
        setLoading(true); // Show loader immediately on button click
       loginMutate({
             email,
             password
+        }, {
+            onSuccess: () => {
+                setTimeout(() => {
+                    setLoading(false);
+                    setIsExiting(true);
+                    setAuthenticated(true);
+                    navigate('/');
+                }, 2000);
+            },
+            onError: (err: any) => {
+                setLoading(false);
+                setError(err.response?.data?.message || err.message || 'An error occurred during login');
+            }
         });
-
-        if(loginPending) {
-            setLoading(true); // Show loader while waiting for the mutation to complete
-            setIsExiting(false); // Reset exit state for the loader
-        }else if(loginIsError) {
-            setLoading(false);
-            setError(loginError.message)
-            console.error('Error during authentication:', loginError);
-        }
-         setTimeout(() => {
-          setLoading(false);
-            setIsExiting(true); // Trigger exit animation
-            setAuthenticated(true); // Update Zustand global state
-         
-            navigate('/')
-        
-        }, 2000);
-
     };
 
     return(
@@ -140,7 +159,7 @@ export default function Login(){
                 {/* Adaptive CTA Action Button text */}
                 <button className='verify-btn' 
                     //  onClick={!verify ? () => setVerify(true) : verifyAuth}
-                    onClick={isExistingUser ? verifyLogin : verifySignUp}
+                    onClick={isExistingUser? verifyLogin : verifySignUp}
                 >
                    {/* {verify 
                        ? (isExistingUser ? 'Enter Room' : 'Create Room') 
@@ -151,7 +170,7 @@ export default function Login(){
                    }
                 </button>
                 {
-                    error && <p className='error-message'>Error: {error}</p>
+                    error && <p className='error-message'>{error}</p>
                 }
                 
                 {/* Adaptive Navigation Footer Link options */}

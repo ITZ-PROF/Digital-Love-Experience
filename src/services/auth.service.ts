@@ -1,5 +1,6 @@
 import {api} from "../utils/request";
 import {logintypes, signuptypes, logouttypes, loginPayload} from "../types/types";
+import { data } from "react-router-dom";
 
 
 
@@ -11,7 +12,7 @@ const login = async (credentials : loginPayload) : Promise<logintypes> => {
         const response = await api.post('/auth/login', credentials);
         return response.data; // Assuming the API returns user data on successful login
     } catch (error) {
-        console.error('Login failed:', error);
+        console.log('Login failed:', error);
         throw error; // Rethrow the error to be handled by the caller
     }
 };

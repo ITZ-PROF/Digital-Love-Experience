@@ -14,7 +14,7 @@ export const useLogin = ()=> useMutation({
     },
     onError: (error) => {
         // Handle login error, e.g., show error message to user
-        console.error('Login error:', error);
+        console.log('Login error:', error);
     },
 });
 

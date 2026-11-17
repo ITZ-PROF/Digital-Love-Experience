@@ -111,3 +111,8 @@
         display: flex;      /* REVEALS the image division container on desktop */
     }
 }
+
+
+.error-message {
+    color: var(--primary)
+}
