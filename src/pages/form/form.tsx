@@ -5,6 +5,7 @@ import logo from '../../assets/logo_variant_2.svg'
 import { useNavigate } from 'react-router-dom';
 import LoadingPage from '../../components/loadingpage/loader';
 import { useExperiences } from '../../stores/experiencesStore';
+import { useAuth } from '../../stores/authstore';
 
 interface StepConfig {
   id: number;
@@ -40,6 +41,7 @@ export default function Form() {
   const submitTimers = useRef<number[]>([]);
   const navigate = useNavigate();
   const addExperience = useExperiences((state) => state.addExperience);
+  const creatorId = useAuth((state) => state.user?.id);
 
   useEffect(() => () => {
     submitTimers.current.forEach((timer) => window.clearTimeout(timer));
@@ -60,6 +62,10 @@ export default function Form() {
 
   const handleSaveAndShare = () => {
     if (isSubmitting) return;
+    if (!creatorId) {
+      navigate('/login', { state: { from: { pathname: '/form' } } });
+      return;
+    }
 
     const shareCode = Math.random().toString(36).slice(2, 8);
     const experienceUrl = `${window.location.origin}/?experience=${shareCode}`;
@@ -76,6 +82,7 @@ export default function Form() {
     submitTimers.current.push(window.setTimeout(() => {
       addExperience({
         id: shareCode,
+        creatorId,
         creatorName,
         recipientName,
         occasion,

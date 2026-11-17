@@ -7,12 +7,9 @@ import Quote from "../../components/quote/quotesection";
 import CTA from "../../components/cta/ctasection";
 import Footer from "../../components/footer/footersection";
 import './homepage.css';
-import { useAuth } from "../../stores/authstore";
 
 function Homepage() {
 
-     const authenticated = useAuth((state) => state.authenticated);
-    const setAuthenticated = useAuth((state) => state.setAuthenticated);
     const homepageRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -51,7 +48,7 @@ function Homepage() {
 
     return (
         <div className="homepage" ref={homepageRef}>
-            <Navbar type={authenticated? "authenticated" : "unauthenticated"} />
+            <Navbar />
             <div className="scroll-reveal"><HeroSection /></div>
             <div className="scroll-reveal"><DisplaySection /></div>
             <div className="scroll-reveal"><Features /></div>

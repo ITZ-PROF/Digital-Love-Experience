@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import LoadingPage from '../../components/loadingpage/loader';
 import { useAuth } from '../../stores/authstore';
 import { Experience, useExperiences } from '../../stores/experiencesStore';
@@ -40,24 +40,29 @@ function ExperienceCard({ experience }: { experience: Experience }) {
 }
 
 export default function Dashboard() {
-  const authenticated = useAuth((state) => state.authenticated);
-  // const setAuthenticated = useAuth((state) => state.setAuthenticated);
-  const experiences = useExperiences((state) => state.experiences);
+  const user = useAuth((state) => state.user);
+  const allExperiences = useExperiences((state) => state.experiences);
+  const experiences = allExperiences.filter((experience) => experience.creatorId === user?.id);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [logoutError, setLogoutError] = useState('');
 
-  const { mutate, isError } = useLogout();
+  const { mutateAsync, isPending } = useLogout();
 
   useEffect(() => {
     const timer = window.setTimeout(() => setLoading(false), 350);
     return () => window.clearTimeout(timer);
   }, []);
 
-  if (!authenticated) return <Navigate to="/login" replace />;
-
-  const handleLogout = () => {
-    mutate();
-    navigate('/');
+  const handleLogout = async () => {
+    setLogoutError('');
+    try {
+      await mutateAsync();
+      navigate('/');
+    } catch (error) {
+      console.error('Unable to log out:', error);
+      setLogoutError('We could not log you out. Please try again.');
+    }
   };
 
   return (
@@ -77,8 +82,9 @@ export default function Dashboard() {
               type="button"
               className="dashboard-logout button-primary"
               onClick={handleLogout}
+              disabled={isPending}
             >
-              Log out
+              {isPending ? 'Logging out...' : 'Log out'}
             </button>
           </div>
           <div className="dashboard-heading">
@@ -89,6 +95,8 @@ export default function Dashboard() {
             </p>
           </div>
         </header>
+
+        {logoutError && <p role="alert">{logoutError}</p>}
 
         {experiences.length > 0 ? (
           <section aria-label="Your created experiences">

@@ -1,38 +1,47 @@
-import {api} from "../utils/request";
-import {logintypes, signuptypes, logouttypes, loginPayload} from "../types/types";
+import { api } from '../utils/request';
+import {
+    AuthMessageResponse,
+    AuthResponse,
+    loginPayload,
+    signuptypes,
+} from '../types/types';
 
-
-
-
-
-
-const login = async (credentials : loginPayload) : Promise<logintypes> => {
-    try {
-        const response = await api.post('/auth/login', credentials);
-        return response.data; // Assuming the API returns user data on successful login
-    } catch (error) {
-        console.error('Login failed:', error);
-        throw error; // Rethrow the error to be handled by the caller
-    }
+export const login = async (credentials: loginPayload): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>('/auth/login', credentials);
+    return response.data;
 };
 
-const register = async (credentials: signuptypes) : Promise<signuptypes> => {
-    try {
-        const response = await api.post('/auth/register', credentials );
-        return response.data; // Assuming the API returns user data on successful registration
-    } catch (error) {
-        console.error('Registration failed:', error);
-        throw error; // Rethrow the error to be handled by the caller
-    }
-};
-const logout = async () : Promise<logouttypes> => {
-    try {
-        const response = await api.post('/auth/logout' );
-        return response.data; // Assuming the API returns user data on successful registration
-    } catch (error) {
-        console.error('logout session failed:', error);
-        throw error; // Rethrow the error to be handled by the caller
-    }
+export const register = async (credentials: signuptypes): Promise<AuthMessageResponse> => {
+    const response = await api.post<AuthMessageResponse>('/auth/register', credentials);
+    return response.data;
 };
 
-export { login, register, logout };
+export const getCurrentUser = async (): Promise<AuthResponse> => {
+    const response = await api.get<AuthResponse>('/auth/me');
+    return response.data;
+};
+
+export const verifyEmail = async (token: string): Promise<AuthMessageResponse> => {
+    const response = await api.post<AuthMessageResponse>('/auth/verify-email', { token });
+    return response.data;
+};
+
+export const resendVerificationEmail = async (email: string): Promise<AuthMessageResponse> => {
+    const response = await api.post<AuthMessageResponse>('/auth/resend-verification', { email });
+    return response.data;
+};
+
+export const requestPasswordReset = async (email: string): Promise<AuthMessageResponse> => {
+    const response = await api.post<AuthMessageResponse>('/auth/password-reset/request', { email });
+    return response.data;
+};
+
+export const resetPassword = async (token: string, password: string): Promise<AuthMessageResponse> => {
+    const response = await api.post<AuthMessageResponse>('/auth/password-reset/confirm', { token, password });
+    return response.data;
+};
+
+export const logout = async (): Promise<AuthMessageResponse> => {
+    const response = await api.post<AuthMessageResponse>('/auth/logout');
+    return response.data;
+};

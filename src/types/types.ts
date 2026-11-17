@@ -1,23 +1,7 @@
-export interface rootObject {
-    signUptypes: signuptypes;
-    logintypes: logintypes;
-}
-
-
-
 export interface signuptypes {
-    fullName: String;
-    email: String;
-    password: String;
-}
-
-export interface logintypes {
-    user: {
-        id: string;
-        name: string;
-        email: string;
-    };
-    token: string;
+    fullName: string;
+    email: string;
+    password: string;
 }
 
 export interface loginPayload {
@@ -25,10 +9,21 @@ export interface loginPayload {
     password: string;
 }
 
+export interface AuthUser {
+    id: string;
+    fullName: string;
+    email: string;
+    emailVerifiedAt: string;
+}
 
-export interface logouttypes {
+export interface AuthResponse {
+    status: string;
+    data: {
+        user: AuthUser;
+    };
+}
+
+export interface AuthMessageResponse {
     status: string;
     message: string;
 }
-
-

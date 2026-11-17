@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export interface Experience {
   id: string;
+  creatorId: string;
   creatorName: string;
   recipientName: string;
   occasion: string;

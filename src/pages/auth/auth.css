@@ -36,6 +36,68 @@
     width: 100%;
 }
 
+.auth-description {
+    max-width: 420px;
+    text-align: center;
+    line-height: var(--line-height-base);
+}
+
+.auth-form,
+.auth-action-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.auth-form .input-container,
+.auth-action-form .input-container {
+    width: 100%;
+}
+
+.auth-feedback {
+    width: 100%;
+    max-width: 420px;
+}
+
+.auth-feedback--error,
+.error-message {
+    color: #a32020;
+}
+
+.auth-feedback--success {
+    color: #176b3a;
+}
+
+.auth-secondary-action {
+    margin-top: 16px;
+}
+
+.auth-action-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    max-width: 480px;
+    margin: 8vh auto;
+    padding: 24px;
+}
+
+.auth-action-form {
+    width: 100%;
+}
+
+.auth-session-error {
+    max-width: 480px;
+    margin: 48px auto;
+    padding: 24px;
+}
+
+.verify-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
 /* Clean, Responsive Button Design */
 .verify-btn {
     background-color: var(--color-brand);
@@ -70,6 +132,11 @@
     font-weight: var(--font-weight-medium);
     transition: all ease-in-out 0.3s;
     text-decoration: none;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    font: inherit;
 }
 
 .login-link:hover {
@@ -110,4 +177,9 @@
     .authpage-right {
         display: flex;      /* REVEALS the image division container on desktop */
     }
+}
+
+
+.error-message {
+    color: var(--primary)
 }

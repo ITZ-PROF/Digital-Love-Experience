@@ -3,6 +3,6 @@ import environment from "../constants/environment";
 
 export const api = axios.create({
     baseURL: `${environment.api.url}`,
-    withCredentials: true
-    
+    withCredentials: true,
+    timeout: 15000,
 });
