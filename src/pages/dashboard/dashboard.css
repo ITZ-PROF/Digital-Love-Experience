@@ -203,6 +203,24 @@
   text-underline-offset: 3px;
 }
 
+.experience-card-pay {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.experience-card-pay:disabled {
+  cursor: wait;
+}
+
+.experience-card-payment-error {
+  margin: 8px 0 0;
+  color: #a32125;
+  font-size: var(--font-size-very-small);
+}
+
 .dashboard-error,
 .dashboard-preview-error {
   width: min(100%, 620px);

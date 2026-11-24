@@ -11,6 +11,8 @@ import Form from './pages/form/form';
 import BirthdayTemplate1 from './components/templates/birthdaytemplate1/BirthdayTemplate1';
 import Dashboard from './pages/dashboard/Dashboard';
 import ExperiencePreview from './pages/dashboard/ExperiencePreview';
+import SharedExperiencePage from './pages/share/SharedExperience';
+import PaymentCallback from './pages/payment/PaymentCallback';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import axios from 'axios';
 import { getCurrentUser } from './services/auth.service';
@@ -97,10 +99,12 @@ function Applive() {
             } 
           />
           <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+          <Route path="/payment/callback" element={<PaymentCallback />} />
           <Route
             path="/experiences/:id/preview"
             element={<RequireAuth><ExperiencePreview /></RequireAuth>}
           />
+          <Route path="/share/:id" element={<SharedExperiencePage />} />
           
           {/* Dedicated Authentication Route */}
           <Route path="/login" element={<Login />} />

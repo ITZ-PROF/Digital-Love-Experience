@@ -3,15 +3,39 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import LoadingPage from '../../components/loadingpage/loader';
-import { Experience, listExperienceDrafts } from '../../services/experience.service';
+import {
+  Experience,
+  initializeExperiencePayment,
+  listExperienceDrafts,
+} from '../../services/experience.service';
 import { useAuth } from '../../stores/authstore';
 import './dashboard.css';
 import { useLogout } from '../../hooks/use-auth';
 
 function ExperienceCard({ experience }: { experience: Experience }) {
+  const [paymentError, setPaymentError] = useState('');
+  const [isStartingPayment, setIsStartingPayment] = useState(false);
   const occasion = experience.occasion
     ? experience.occasion.charAt(0).toUpperCase() + experience.occasion.slice(1)
     : 'Special moment';
+
+  const handleStartPayment = async () => {
+    if (!experience.paymentProvider) {
+      setPaymentError('This draft has no saved payment method. Create a new experience to continue.');
+      return;
+    }
+
+    setPaymentError('');
+    setIsStartingPayment(true);
+    try {
+      const checkout = await initializeExperiencePayment(experience.id);
+      window.location.assign(checkout.authorizationUrl);
+    } catch (error) {
+      setPaymentError(getLoadError(error));
+    } finally {
+      setIsStartingPayment(false);
+    }
+  };
 
   return (
     <article
@@ -35,9 +59,36 @@ function ExperienceCard({ experience }: { experience: Experience }) {
             year: 'numeric',
           })}
         </time>
-        <Link className="experience-card-preview" to={`/experiences/${encodeURIComponent(experience.id)}/preview`}>
-          Preview draft
-        </Link>
+        {experience.status === 'ACTIVE' ? (
+          experience.isPaymentSimulated ? (
+            <span className="experience-card-preview">Awaiting real payment</span>
+          ) : experience.shareToken ? (
+            <Link className="experience-card-preview" to={`/share/${encodeURIComponent(experience.shareToken)}`}>
+              Open share page
+            </Link>
+          ) : (
+            <span className="experience-card-preview">Published experience</span>
+          )
+        ) : ['DRAFT', 'PENDING_PAYMENT'].includes(experience.status) ? (
+          <>
+            <Link className="experience-card-preview" to={`/experiences/${encodeURIComponent(experience.id)}/preview`}>
+              {experience.status === 'PENDING_PAYMENT' ? 'Preview experience' : 'Preview draft'}
+            </Link>
+            <button
+              type="button"
+              className="experience-card-preview experience-card-pay"
+              onClick={() => void handleStartPayment()}
+              disabled={isStartingPayment}
+            >
+              {isStartingPayment
+                ? 'Starting checkout...'
+                : experience.status === 'PENDING_PAYMENT' ? 'Continue checkout' : 'Pay with Paystack'}
+            </button>
+            {paymentError && <p className="experience-card-payment-error" role="alert">{paymentError}</p>}
+          </>
+        ) : (
+          <span className="experience-card-preview">This experience has expired</span>
+        )}
       </div>
     </article>
   );
@@ -117,7 +168,7 @@ export default function Dashboard() {
         ) : experiences.length > 0 ? (
           <section aria-label="Your created experiences">
             <div className="dashboard-gallery-heading">
-              <h2>Saved drafts</h2>
+              <h2>Your saved experiences</h2>
               <span>{experiences.length}</span>
             </div>
             <div className="dashboard-gallery">

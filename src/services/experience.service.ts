@@ -18,10 +18,26 @@ export interface Experience {
     themeMode: string;
     paymentPhone: string | null;
     paymentProvider: string | null;
+    isPaymentSimulated: boolean;
+    shareToken: string | null;
     status: ExperienceStatus;
     createdAt: string;
     updatedAt: string;
 }
+
+export type SharedExperience = Pick<
+    Experience,
+    | 'creatorName'
+    | 'recipientName'
+    | 'occasion'
+    | 'templateKey'
+    | 'heroImageUrl'
+    | 'heartfeltMessage'
+    | 'quoteText'
+    | 'selectedColor'
+    | 'themeMode'
+    | 'createdAt'
+>;
 
 export type ExperienceDraftInput = Pick<
     Experience,
@@ -34,10 +50,10 @@ export type ExperienceDraftInput = Pick<
     | 'quoteText'
     | 'selectedColor'
     | 'themeMode'
-    | 'paymentPhone'
     | 'paymentProvider'
 > & {
     heroImagePath?: string;
+    paymentPhone?: string | null;
 };
 
 interface ExperienceResponse {
@@ -54,11 +70,37 @@ interface ExperienceListResponse {
     };
 }
 
+interface SharedExperienceResponse {
+    status: string;
+    data: {
+        experience: SharedExperience;
+    };
+}
+
 interface ExperienceImageUploadResponse {
     status: string;
     data: {
         heroImagePath: string;
     };
+}
+
+export interface PaystackCheckout {
+    reference: string;
+    authorizationUrl: string;
+}
+
+export interface PaystackVerification {
+    paymentStatus: 'SUCCESS' | 'PENDING' | 'FAILED';
+}
+
+interface PaystackCheckoutResponse {
+    status: string;
+    data: PaystackCheckout;
+}
+
+interface PaystackVerificationResponse {
+    status: string;
+    data: PaystackVerification;
 }
 
 export async function uploadExperienceImage(file: File): Promise<string> {
@@ -92,5 +134,30 @@ export async function updateExperienceDraft(
     draft: Partial<ExperienceDraftInput>
 ): Promise<Experience> {
     const response = await api.patch<ExperienceResponse>(`/experiences/${encodeURIComponent(id)}`, draft);
+    return response.data.data.experience;
+}
+
+export async function initializeExperiencePayment(
+    experienceId: string
+): Promise<PaystackCheckout> {
+    const response = await api.post<PaystackCheckoutResponse>(
+        `/payments/paystack/experiences/${encodeURIComponent(experienceId)}/initialize`,
+        {}
+    );
+    return response.data.data;
+}
+
+export async function verifyPaystackCallback(reference: string): Promise<PaystackVerification> {
+    const response = await api.post<PaystackVerificationResponse>(
+        '/payments/paystack/verify',
+        { reference }
+    );
+    return response.data.data;
+}
+
+export async function getSharedExperience(token: string): Promise<SharedExperience> {
+    const response = await api.get<SharedExperienceResponse>(
+        `/experiences/share/${encodeURIComponent(token)}`
+    );
     return response.data.data.experience;
 }

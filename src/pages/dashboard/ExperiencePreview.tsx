@@ -1,47 +1,11 @@
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import BirthdayTemplate1, {
-    BirthdayTemplateData,
-} from '../../components/templates/birthdaytemplate1/BirthdayTemplate1';
+import BirthdayTemplate1 from '../../components/templates/birthdaytemplate1/BirthdayTemplate1';
 import LoadingPage from '../../components/loadingpage/loader';
 import { getExperienceDraft } from '../../services/experience.service';
+import { toBirthdayTemplateData } from '../../utils/experienceTemplateData';
 import './dashboard.css';
-
-function getPreviewData(experience: Awaited<ReturnType<typeof getExperienceDraft>>): Partial<BirthdayTemplateData> {
-    const recipientName = experience.recipientName || 'Someone special';
-    const senderName = experience.creatorName || 'Someone who cares';
-    const occasion = experience.occasion || 'special occasion';
-    const createdAt = new Date(experience.createdAt);
-    const message = experience.heartfeltMessage.trim();
-
-    return {
-        recipientName,
-        senderName,
-        occasionLabel: `CELEBRATING ${occasion.toUpperCase()}`,
-        title: occasion.toLowerCase() === 'birthday'
-            ? `Happy Birthday, ${recipientName}!`
-            : `A special ${occasion} for ${recipientName}!`,
-        heroImageUrl: experience.heroImageUrl || undefined,
-        heroImageAlt: experience.heroImageUrl
-            ? `Uploaded birthday photo for ${recipientName}`
-            : 'Birthday celebration illustration',
-        letterDate: createdAt.toLocaleDateString(undefined, {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
-        }),
-        letterDateIso: createdAt.toISOString().slice(0, 10),
-        letterGreeting: `Dear ${recipientName},`,
-        letterParagraphs: message ? message.split(/\n{2,}/).filter(Boolean) : ['A message made with love.'],
-        letterSignoff: 'With love,',
-        quoteNumber: '01',
-        quoteText: experience.quoteText || '',
-        quoteAuthor: '',
-        closingTitle: `A special moment made for ${recipientName}.`,
-        copyright: [`Made with love for ${recipientName}.`],
-    };
-}
 
 function getLoadError(error: unknown): string {
     if (axios.isAxiosError<{ message?: string }>(error)) {
@@ -80,12 +44,12 @@ export default function ExperiencePreview() {
         );
     }
 
-    if (experience.status !== 'DRAFT') {
+    if (!['DRAFT', 'PENDING_PAYMENT'].includes(experience.status)) {
         return (
             <main className="dashboard-page">
                 <section className="dashboard-preview-error" role="status">
-                    <h1>This experience is not a draft</h1>
-                    <p>Only saved drafts can be previewed here.</p>
+                    <h1>This experience cannot be previewed</h1>
+                    <p>Only saved drafts and pending-payment experiences can be previewed here.</p>
                     <button type="button" className="dashboard-preview-back" onClick={() => navigate('/dashboard')}>
                         Back to your experiences
                     </button>
@@ -113,7 +77,7 @@ export default function ExperiencePreview() {
     return (
         <BirthdayTemplate1
             className={themeClass}
-            data={getPreviewData(experience)}
+            data={toBirthdayTemplateData(experience)}
             showCreateCta={false}
             onBack={() => navigate('/dashboard')}
         />

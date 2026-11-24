@@ -54,16 +54,19 @@ test('previews the filled birthday experience before showing payment details', (
   });
   fireEvent.click(screen.getByRole('button', { name: 'Next' }));
 
+  expect(document.querySelector('.template-cards-grid')).toBeInTheDocument();
   const image = new File(['birthday photo'], 'birthday.png', { type: 'image/png' });
   fireEvent.change(screen.getByLabelText('Upload a birthday photo'), {
     target: { files: [image] },
   });
   expect(screen.getByAltText('Selected for Sam Recipient')).toHaveAttribute('src', 'blob:experience-photo');
 
+  fireEvent.click(screen.getByRole('button', { name: 'Green color palette' }));
+  fireEvent.click(screen.getByLabelText('Light'));
   fireEvent.click(screen.getByRole('button', { name: /view the full birthday letter template/i }));
   fireEvent.click(screen.getByRole('button', { name: 'Use this template' }));
 
-  fireEvent.click(screen.getByRole('button', { name: 'Go to step 4: Payment Info' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Go to step 4: Payment Details' }));
   expect(screen.getByRole('button', { name: 'Close preview' })).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Close preview' }));
 
@@ -71,6 +74,7 @@ test('previews the filled birthday experience before showing payment details', (
 
   expect(screen.getByRole('heading', { name: 'Happy Birthday, Sam Recipient!' })).toBeInTheDocument();
   const preview = screen.getByRole('dialog', { name: 'Your birthday experience' });
+  expect(preview.querySelector('.birthday-template-container')).toHaveClass('experience-color-green', 'experience-theme-light');
   expect(preview.querySelector('.hero-image-frame')).toHaveAttribute('alt', 'Birthday celebration for Sam Recipient');
   expect(preview.querySelector('.hero-image-frame')).toHaveAttribute('src', 'blob:experience-photo');
   expect(preview).toHaveTextContent(/With all my love,\s*Alex Creator/);
@@ -81,5 +85,9 @@ test('previews the filled birthday experience before showing payment details', (
   expect(screen.getByRole('button', { name: 'Continue to payment details' })).toBeInTheDocument();
 
   fireEvent.click(screen.getByRole('button', { name: 'Continue to payment details' }));
-  expect(screen.getByRole('heading', { name: 'Payment Info' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Payment Details' })).toBeInTheDocument();
+  expect(screen.getByLabelText('Preferred Payment Method')).toBeInTheDocument();
+  fireEvent.change(screen.getByLabelText('Preferred Payment Method'), { target: { value: 'momo' } });
+  expect(screen.queryByLabelText('Mobile Money Number')).not.toBeInTheDocument();
+  expect(screen.getByText(/Paystack collects the required payment details there/i)).toBeInTheDocument();
 });
