@@ -10,6 +10,7 @@ import RequireAuth from './pages/auth/RequireAuth';
 import Form from './pages/form/form';
 import BirthdayTemplate1 from './components/templates/birthdaytemplate1/BirthdayTemplate1';
 import Dashboard from './pages/dashboard/Dashboard';
+import ExperiencePreview from './pages/dashboard/ExperiencePreview';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import axios from 'axios';
 import { getCurrentUser } from './services/auth.service';
@@ -96,6 +97,10 @@ function Applive() {
             } 
           />
           <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+          <Route
+            path="/experiences/:id/preview"
+            element={<RequireAuth><ExperiencePreview /></RequireAuth>}
+          />
           
           {/* Dedicated Authentication Route */}
           <Route path="/login" element={<Login />} />

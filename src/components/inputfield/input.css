@@ -110,6 +110,18 @@ position: absolute;
   padding: 15px 11px; /* Adjusts padding slightly to offset 2px border expansion */
 }
 
+.input-container.has-error .custom-field {
+  box-shadow: inset 0 0 0 1px #b4232a;
+}
+
+.input-error {
+  display: block;
+  margin-top: 6px;
+  color: #a32125;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 /* Extra alignment adjustment for active textarea */
 textarea.custom-field:focus {
   padding-top: 23px;

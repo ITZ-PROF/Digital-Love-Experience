@@ -1,11 +1,20 @@
-import { CSSProperties, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './form.css';
 import InputField from '../../components/inputfield/input';
 import logo from '../../assets/logo_variant_2.svg'
 import { useNavigate } from 'react-router-dom';
 import LoadingPage from '../../components/loadingpage/loader';
-import { useExperiences } from '../../stores/experiencesStore';
+import { useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { createExperienceDraft } from '../../services/experience.service';
 import { useAuth } from '../../stores/authstore';
+import BirthdayTemplate1 from '../../components/templates/birthdaytemplate1/BirthdayTemplate1';
+import birthdayTemplateThumbnail from '../../assets/templateimage.svg';
+import {
+  ExperienceFormErrors,
+  ExperienceFormValues,
+  validateExperienceFormStep,
+} from './formValidation';
 
 interface StepConfig {
   id: number;
@@ -20,6 +29,17 @@ const STEPS: StepConfig[] = [
   { id: 4, title: 'Payment Info', subtitle: 'Details for payment process' }
 ];
 
+const TEMPLATES_BY_OCCASION = {
+  birthday: [
+    {
+      id: 'birthday-template-1',
+      name: 'Birthday Letter',
+      description: 'A warm, letter-style birthday celebration.',
+      thumbnail: birthdayTemplateThumbnail,
+    },
+  ],
+};
+
 export default function Form() {
   const [activeStep, setActiveStep] = useState<number>(1);
   const [creatorName, setCreatorName] = useState('');
@@ -28,27 +48,87 @@ export default function Form() {
   const [recipientWhatsapp, setRecipientWhatsapp] = useState('');
   const [heartfeltMessage, setHeartfeltMessage] = useState('');
   const [songLink, setSongLink] = useState('');
-  const [selectedColor, setSelectedColor] = useState('purple');
-  const [themeMode, setThemeMode] = useState('dark');
+  const [templateKey, setTemplateKey] = useState('');
   const [senderWhatsapp, setSenderWhatsapp] = useState('');
   const [serviceProvider, setServiceProvider] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<ExperienceFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoadingExiting, setIsLoadingExiting] = useState(false);
+  const [showTemplatePreview, setShowTemplatePreview] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showExperiencePreview, setShowExperiencePreview] = useState(false);
-  const [shareUrl, setShareUrl] = useState('');
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [savedExperienceId, setSavedExperienceId] = useState('');
   const [linkCopied, setLinkCopied] = useState(false);
-  const submitTimers = useRef<number[]>([]);
+  const [copyError, setCopyError] = useState('');
+  const [submitError, setSubmitError] = useState('');
   const navigate = useNavigate();
-  const addExperience = useExperiences((state) => state.addExperience);
+  const templatePreviewRef = useRef<HTMLDialogElement>(null);
+  const queryClient = useQueryClient();
   const creatorId = useAuth((state) => state.user?.id);
+  const formValues: ExperienceFormValues = {
+    creatorName,
+    occasion,
+    recipientName,
+    recipientRelationship: recipientWhatsapp,
+    heartfeltMessage,
+    quoteText: songLink,
+    templateKey,
+    paymentPhone: senderWhatsapp,
+    paymentProvider: serviceProvider,
+  };
+  const availableTemplates = occasion === 'birthday' ? TEMPLATES_BY_OCCASION.birthday : [];
 
-  useEffect(() => () => {
-    submitTimers.current.forEach((timer) => window.clearTimeout(timer));
-  }, []);
+  useEffect(() => {
+    const dialog = templatePreviewRef.current;
+    if (!dialog) return;
+
+    if (showTemplatePreview && !dialog.open) {
+      dialog.showModal();
+    } else if (!showTemplatePreview && dialog.open) {
+      dialog.close();
+    }
+  }, [showTemplatePreview]);
+
+  const validateSteps = (steps: number[]) => {
+    const errors: ExperienceFormErrors = {};
+    let firstInvalidStep: number | null = null;
+
+    for (const step of steps) {
+      const stepErrors = validateExperienceFormStep(step, formValues);
+      Object.assign(errors, stepErrors);
+      if (firstInvalidStep === null && Object.keys(stepErrors).length > 0) {
+        firstInvalidStep = step;
+      }
+    }
+
+    setFieldErrors(errors);
+    if (firstInvalidStep !== null) setActiveStep(firstInvalidStep);
+    return firstInvalidStep === null;
+  };
+
+  const clearFieldError = (field: keyof ExperienceFormValues) => {
+    setFieldErrors((current) => {
+      if (!current[field]) return current;
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+  };
 
   const handleNext = () => {
-    if (activeStep < STEPS.length) setActiveStep((prev) => prev + 1);
+    if (activeStep < STEPS.length && validateSteps([activeStep])) {
+      setActiveStep((prev) => prev + 1);
+    }
+  };
+
+  const handleStepNavigation = (targetStep: number) => {
+    if (targetStep <= activeStep) {
+      setActiveStep(targetStep);
+      return;
+    }
+
+    if (validateSteps(Array.from({ length: targetStep - 1 }, (_, index) => index + 1))) {
+      setActiveStep(targetStep);
+    }
   };
 
   const handleBack = () => {
@@ -60,56 +140,61 @@ export default function Form() {
     }
   };
 
-  const handleSaveAndShare = () => {
+  const handleSaveDraft = async () => {
     if (isSubmitting) return;
+    if (!validateSteps([1, 2, 3, 4])) return;
     if (!creatorId) {
       navigate('/login', { state: { from: { pathname: '/form' } } });
       return;
     }
 
-    const shareCode = Math.random().toString(36).slice(2, 8);
-    const experienceUrl = `${window.location.origin}/?experience=${shareCode}`;
-    setShareUrl(experienceUrl);
+    setSubmitError('');
+    setCopyError('');
     setLinkCopied(false);
-    setShowExperiencePreview(false);
-    setIsLoadingExiting(false);
     setIsSubmitting(true);
-
-    submitTimers.current.push(window.setTimeout(() => {
-      setIsLoadingExiting(true);
-    }, 1700));
-
-    submitTimers.current.push(window.setTimeout(() => {
-      addExperience({
-        id: shareCode,
-        creatorId,
+    try {
+      const experience = await createExperienceDraft({
         creatorName,
         recipientName,
+        recipientRelationship: recipientWhatsapp,
         occasion,
+        templateKey,
         heartfeltMessage,
-        selectedColor,
-        themeMode,
-        shareUrl: experienceUrl,
-        createdAt: new Date().toISOString(),
+        quoteText: songLink,
+        selectedColor: 'purple',
+        themeMode: 'dark',
+        paymentPhone: senderWhatsapp,
+        paymentProvider: serviceProvider,
       });
-      setIsSubmitting(false);
-      setIsLoadingExiting(false);
+      const privatePreviewUrl = `${window.location.origin}/experiences/${encodeURIComponent(experience.id)}/preview`;
+      setSavedExperienceId(experience.id);
+      setPreviewUrl(privatePreviewUrl);
       setShowSuccessModal(true);
-    }, 2400));
+      await queryClient.invalidateQueries({ queryKey: ['experiences'] });
+    } catch (error) {
+      const message = axios.isAxiosError<{ message?: string }>(error)
+        ? error.response?.data?.message || error.message
+        : 'We could not save your draft. Please try again.';
+      setSubmitError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      await navigator.clipboard.writeText(previewUrl);
       setLinkCopied(true);
-    } catch {
+      setCopyError('');
+    } catch (error) {
+      console.error('Unable to copy the private preview link:', error);
       setLinkCopied(false);
+      setCopyError('Could not copy the link. You can select and copy it manually.');
     }
   };
 
   const handleCreateAnother = () => {
     setShowSuccessModal(false);
-    setShowExperiencePreview(false);
     setActiveStep(1);
     setCreatorName('');
     setOccasion('');
@@ -117,10 +202,20 @@ export default function Form() {
     setRecipientWhatsapp('');
     setHeartfeltMessage('');
     setSongLink('');
-    setSelectedColor('purple');
-    setThemeMode('dark');
+    setTemplateKey('');
     setSenderWhatsapp('');
     setServiceProvider('');
+    setFieldErrors({});
+    setSavedExperienceId('');
+    setPreviewUrl('');
+    setSubmitError('');
+    setCopyError('');
+  };
+
+  const selectBirthdayTemplate = () => {
+    setTemplateKey('birthday-template-1');
+    clearFieldError('templateKey');
+    setShowTemplatePreview(false);
   };
 
   return (
@@ -149,7 +244,7 @@ export default function Form() {
                   type="button"
                   key={step.id} 
                   className={`step-item-row ${isActive ? 'is-active' : ''} ${isCompleted ? 'is-completed' : ''}`}
-                  onClick={() => setActiveStep(step.id)}
+                  onClick={() => handleStepNavigation(step.id)}
                   aria-current={isActive ? 'step' : undefined}
                   aria-label={`Go to step ${step.id}: ${step.title}`}
                 >
@@ -182,7 +277,13 @@ export default function Form() {
                     label="Full Name"
                     multiline={false}
                     value={creatorName}
-                    onChange={(event) => setCreatorName(event.target.value)}
+                    required
+                    maxLength={120}
+                    error={fieldErrors.creatorName}
+                    onChange={(event) => {
+                      setCreatorName(event.target.value);
+                      clearFieldError('creatorName');
+                    }}
                   />
                   
                   {/* Select Occasion Input Field Dropdown */}
@@ -190,15 +291,22 @@ export default function Form() {
                     <select 
                       className={`custom-select-element ${occasion ? 'has-value' : ''}`}
                       value={occasion}
-                      onChange={(e) => setOccasion(e.target.value)}
+                      required
+                      aria-invalid={Boolean(fieldErrors.occasion)}
+                      aria-describedby={fieldErrors.occasion ? 'occasion-error' : undefined}
+                      onChange={(event) => {
+                        setOccasion(event.target.value);
+                        setTemplateKey('');
+                        clearFieldError('occasion');
+                        clearFieldError('templateKey');
+                      }}
                     >
                       <option value="" disabled hidden></option>
                       <option value="birthday">Birthday</option>
-                      <option value="anniversary">Anniversary</option>
-                      <option value="wedding">Wedding</option>
                     </select>
                     <label className="select-floating-label">Select Occasion</label>
                     <div className="select-arrow-icon">&#x25BC;</div>
+                    {fieldErrors.occasion && <span id="occasion-error" className="form-field-error" role="alert">{fieldErrors.occasion}</span>}
                   </div>
                 </div>
               )}
@@ -209,20 +317,37 @@ export default function Form() {
                     label="Recipient Full Name"
                     multiline={false}
                     value={recipientName}
-                    onChange={(event) => setRecipientName(event.target.value)}
+                    required
+                    maxLength={120}
+                    error={fieldErrors.recipientName}
+                    onChange={(event) => {
+                      setRecipientName(event.target.value);
+                      clearFieldError('recipientName');
+                    }}
                   />
                   <InputField
-                    label="Relation With Recipient"
+                    label="Relation With Recipient (optional)"
                     multiline={false}
                     value={recipientWhatsapp}
-                    onChange={(event) => setRecipientWhatsapp(event.target.value)}
+                    maxLength={120}
+                    error={fieldErrors.recipientRelationship}
+                    onChange={(event) => {
+                      setRecipientWhatsapp(event.target.value);
+                      clearFieldError('recipientRelationship');
+                    }}
                   />
                   <InputField
                     label="Write your heartfelt message"
                     multiline={true}
                     rows={4}
                     value={heartfeltMessage}
-                    onChange={(event) => setHeartfeltMessage(event.target.value)}
+                    required
+                    maxLength={10000}
+                    error={fieldErrors.heartfeltMessage}
+                    onChange={(event) => {
+                      setHeartfeltMessage(event.target.value);
+                      clearFieldError('heartfeltMessage');
+                    }}
                   />
                 </div>
               )}
@@ -233,47 +358,44 @@ export default function Form() {
                     label="Send an inspirational quote(optional)"
                     multiline={false}
                     value={songLink}
-                    onChange={(event) => setSongLink(event.target.value)}
+                    maxLength={1000}
+                    error={fieldErrors.quoteText}
+                    onChange={(event) => {
+                      setSongLink(event.target.value);
+                      clearFieldError('quoteText');
+                    }}
                   />
 
-                  <fieldset className="color-picker-fieldset">
-                    <legend className="color-palette-label">Select Background Template Color</legend>
-                    <div className="color-cards-grid">
-                      {[
-                        { id: 'purple', label: 'Purple', color: '#4b0f91' },
-                        { id: 'green', label: 'Green', color: '#087333' },
-                        { id: 'olive', label: 'Olive', color: '#89891c' },
-                      ].map((option) => (
+                  <fieldset className="template-picker">
+                    <legend className="color-palette-label">Choose a birthday template</legend>
+                    {availableTemplates.length > 0 ? availableTemplates.map((template) => (
+                      <article
+                        key={template.id}
+                        className={`template-option ${templateKey === template.id ? 'selected' : ''}`}
+                      >
                         <button
-                          key={option.id}
                           type="button"
-                          className={`color-card ${selectedColor === option.id ? 'selected' : ''}`}
-                          style={{ backgroundColor: option.color }}
-                          aria-label={`${option.label} template color`}
-                          aria-pressed={selectedColor === option.id}
-                          onClick={() => setSelectedColor(option.id)}
+                          className="template-snapshot"
+                          onClick={() => setShowTemplatePreview(true)}
+                          aria-label={`View the full ${template.name} template before selecting it`}
                         >
-                          <span className="radio-dot" />
+                          <img src={template.thumbnail} alt="" />
+                          <span>Preview full template</span>
                         </button>
-                      ))}
-                    </div>
-                  </fieldset>
-
-                  <fieldset className="theme-toggle-row">
-                    <legend className="visually-hidden">Choose page theme</legend>
-                    {['dark', 'light'].map((theme) => (
-                      <label className="radio-option" key={theme}>
-                        <input
-                          type="radio"
-                          name="theme"
-                          value={theme}
-                          checked={themeMode === theme}
-                          onChange={() => setThemeMode(theme)}
-                        />
-                        <span className="custom-radio-circle" />
-                        {theme[0].toUpperCase() + theme.slice(1)}
-                      </label>
-                    ))}
+                        <div className="template-option-details">
+                          <div>
+                            <h3>{template.name}</h3>
+                            <p>{template.description}</p>
+                          </div>
+                          <span className="template-selection-status" aria-live="polite">
+                            {templateKey === template.id ? 'Selected' : 'Not selected'}
+                          </span>
+                        </div>
+                      </article>
+                    )) : (
+                      <p className="template-empty-state">Choose an occasion to see its available templates.</p>
+                    )}
+                    {fieldErrors.templateKey && <p className="form-field-error" role="alert">{fieldErrors.templateKey}</p>}
                   </fieldset>
                 </div>
               )}
@@ -281,16 +403,31 @@ export default function Form() {
               {activeStep === 4 && (
                 <div className="step-form-fade-in form-fields-stack">
                   <InputField
-                    label="Enter Mobile Number"
+                    label="Mobile Number for MoMo / Telecel"
                     multiline={false}
+                    type="tel"
+                    autoComplete="tel"
                     value={senderWhatsapp}
-                    onChange={(event) => setSenderWhatsapp(event.target.value)}
+                    required={serviceProvider === 'momo' || serviceProvider === 'telecel'}
+                    maxLength={32}
+                    error={fieldErrors.paymentPhone}
+                    onChange={(event) => {
+                      setSenderWhatsapp(event.target.value);
+                      clearFieldError('paymentPhone');
+                    }}
                   />
                   <div className="dropdown-select-container">
                     <select
                       className={`custom-select-element ${serviceProvider ? 'has-value' : ''}`}
                       value={serviceProvider}
-                      onChange={(event) => setServiceProvider(event.target.value)}
+                      required
+                      aria-invalid={Boolean(fieldErrors.paymentProvider)}
+                      aria-describedby={fieldErrors.paymentProvider ? 'provider-error' : undefined}
+                      onChange={(event) => {
+                        setServiceProvider(event.target.value);
+                        clearFieldError('paymentProvider');
+                        clearFieldError('paymentPhone');
+                      }}
                       aria-label="Select Service Provider"
                     >
                       <option value="" disabled>Select Service Provider</option>
@@ -299,10 +436,13 @@ export default function Form() {
                       <option value="card">Credit / Debit Card</option>
                     </select>
                     <div className="select-arrow-icon" aria-hidden="true">&#x25BC;</div>
+                    {fieldErrors.paymentProvider && <span id="provider-error" className="form-field-error" role="alert">{fieldErrors.paymentProvider}</span>}
                   </div>
                 </div>
               )}
             </section>
+
+            {submitError && <p className="form-submit-error" role="alert">{submitError}</p>}
 
             <footer className="workspace-actions-footer">
               <button 
@@ -315,10 +455,10 @@ export default function Form() {
               <button
                 type="button"
                 className="action-link-btn next"
-                onClick={activeStep === STEPS.length ? handleSaveAndShare : handleNext}
+                onClick={activeStep === STEPS.length ? handleSaveDraft : handleNext}
                 disabled={isSubmitting}
               >
-                <span>{activeStep === STEPS.length ? 'Save & Share' : activeStep === 3 ? 'Proceed To Preview' : 'Next'}</span>
+                <span>{activeStep === STEPS.length ? 'Save Draft' : activeStep === 3 ? 'Proceed To Preview' : 'Next'}</span>
               </button>
             </footer>
 
@@ -326,7 +466,39 @@ export default function Form() {
         </main>
       </div>
 
-      <LoadingPage isModal isOpen={isSubmitting} isExiting={isLoadingExiting} />
+      {showTemplatePreview && (
+        <dialog
+          ref={templatePreviewRef}
+          className="template-preview-dialog"
+          aria-labelledby="template-preview-title"
+          onClose={() => setShowTemplatePreview(false)}
+        >
+          <button
+            type="button"
+            className="template-preview-close"
+            autoFocus
+            onClick={() => setShowTemplatePreview(false)}
+          >
+            Close preview
+          </button>
+          <BirthdayTemplate1
+            className="template-picker-full-preview"
+            showCreateCta={false}
+            onBack={() => setShowTemplatePreview(false)}
+          />
+          <footer className="template-preview-footer">
+            <div>
+              <h2 id="template-preview-title">Birthday Letter</h2>
+              <p>Review the complete template, then choose it for your experience.</p>
+            </div>
+            <button type="button" className="template-select-button" onClick={selectBirthdayTemplate}>
+              Use this template
+            </button>
+          </footer>
+        </dialog>
+      )}
+
+      <LoadingPage isModal isOpen={isSubmitting} />
 
       {showSuccessModal && (
         <div
@@ -350,50 +522,41 @@ export default function Form() {
               ×
             </button>
 
-            {showExperiencePreview ? (
-              <div className={`experience-preview-card theme-${themeMode}`} style={{ '--preview-accent': selectedColor === 'green' ? '#087333' : selectedColor === 'olive' ? '#89891c' : '#4b0f91' } as CSSProperties}>
-                <span className="experience-preview-eyebrow">A special moment for</span>
-                <h2>{recipientName || 'Someone special'}</h2>
-                {occasion && <p className="experience-preview-occasion">{occasion}</p>}
-                <p className="experience-preview-message">{heartfeltMessage || 'Your heartfelt message will appear here.'}</p>
-                <button type="button" className="experience-preview-back" onClick={() => setShowExperiencePreview(false)}>
-                  Back to sharing
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="success-confetti-art" aria-hidden="true" />
-                <h2 id="experience-success-title">Congratulations!</h2>
-                <p className="experience-success-copy">
-                  You have successfully created an experience. Copy and share with your loved one.
-                </p>
+            <div className="success-confetti-art" aria-hidden="true" />
+            <h2 id="experience-success-title">Draft saved</h2>
+            <p className="experience-success-copy">
+              Your draft is saved privately. You can preview it now; public sharing will be available when payment is implemented.
+            </p>
 
-                <div className="experience-share-row">
-                  <span className="experience-share-link" title={shareUrl}>
-                    <span aria-hidden="true">↗</span>
-                    {shareUrl}
-                  </span>
-                  <button
-                    type="button"
-                    className="experience-copy-button"
-                    onClick={handleCopyLink}
-                    aria-label={linkCopied ? 'Link copied' : 'Copy experience link'}
-                  >
-                    {linkCopied ? '✓' : '▢'}
-                  </button>
-                </div>
-                <p className="experience-copy-status" aria-live="polite">
-                  {linkCopied ? 'Link copied to clipboard' : ''}
-                </p>
+            <div className="experience-share-row">
+              <span className="experience-share-link" title={previewUrl}>
+                <span aria-hidden="true">↗</span>
+                {previewUrl}
+              </span>
+              <button
+                type="button"
+                className="experience-copy-button"
+                onClick={handleCopyLink}
+                aria-label={linkCopied ? 'Private preview link copied' : 'Copy private preview link'}
+              >
+                {linkCopied ? '✓' : '▢'}
+              </button>
+            </div>
+            <p className={`experience-copy-status ${copyError ? 'is-error' : ''}`} aria-live="polite">
+              {copyError || (linkCopied ? 'Private preview link copied' : 'Only you can open this preview')}
+            </p>
 
-                <button type="button" className="experience-create-new" onClick={handleCreateAnother}>
-                  Create A New Experience
-                </button>
-                <button type="button" className="experience-view-button" onClick={() => setShowExperiencePreview(true)}>
-                  View Experience
-                </button>
-              </>
-            )}
+            <button type="button" className="experience-create-new" onClick={handleCreateAnother}>
+              Create A New Experience
+            </button>
+            <button
+              type="button"
+              className="experience-view-button"
+              onClick={() => navigate(`/experiences/${encodeURIComponent(savedExperienceId)}/preview`)}
+              disabled={!savedExperienceId}
+            >
+              View Experience
+            </button>
           </section>
         </div>
       )}
