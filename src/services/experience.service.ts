@@ -10,6 +10,8 @@ export interface Experience {
     recipientRelationship: string | null;
     occasion: string;
     templateKey: string;
+    heroImagePath: string | null;
+    heroImageUrl?: string;
     heartfeltMessage: string;
     quoteText: string | null;
     selectedColor: string;
@@ -34,7 +36,9 @@ export type ExperienceDraftInput = Pick<
     | 'themeMode'
     | 'paymentPhone'
     | 'paymentProvider'
->;
+> & {
+    heroImagePath?: string;
+};
 
 interface ExperienceResponse {
     status: string;
@@ -48,6 +52,24 @@ interface ExperienceListResponse {
     data: {
         experiences: Experience[];
     };
+}
+
+interface ExperienceImageUploadResponse {
+    status: string;
+    data: {
+        heroImagePath: string;
+    };
+}
+
+export async function uploadExperienceImage(file: File): Promise<string> {
+    const response = await api.post<ExperienceImageUploadResponse>('/experiences/images', file, {
+        headers: { 'Content-Type': file.type },
+    });
+    return response.data.data.heroImagePath;
+}
+
+export async function deleteExperienceImage(heroImagePath: string): Promise<void> {
+    await api.delete('/experiences/images', { data: { heroImagePath } });
 }
 
 export async function createExperienceDraft(draft: ExperienceDraftInput): Promise<Experience> {

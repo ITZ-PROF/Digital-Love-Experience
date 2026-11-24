@@ -6,7 +6,11 @@ import { useNavigate } from 'react-router-dom';
 import LoadingPage from '../../components/loadingpage/loader';
 import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { createExperienceDraft } from '../../services/experience.service';
+import {
+  createExperienceDraft,
+  deleteExperienceImage,
+  uploadExperienceImage,
+} from '../../services/experience.service';
 import { useAuth } from '../../stores/authstore';
 import BirthdayTemplate1, {
   BirthdayTemplateData,
@@ -15,6 +19,7 @@ import birthdayTemplateThumbnail from '../../assets/templateimage.svg';
 import {
   ExperienceFormErrors,
   ExperienceFormValues,
+  validateExperienceImage,
   validateExperienceFormStep,
 } from './formValidation';
 
@@ -51,6 +56,8 @@ export default function Form() {
   const [heartfeltMessage, setHeartfeltMessage] = useState('');
   const [songLink, setSongLink] = useState('');
   const [templateKey, setTemplateKey] = useState('');
+  const [heroImageFile, setHeroImageFile] = useState<File | null>(null);
+  const [heroImagePreviewUrl, setHeroImagePreviewUrl] = useState('');
   const [senderWhatsapp, setSenderWhatsapp] = useState('');
   const [serviceProvider, setServiceProvider] = useState('');
   const [fieldErrors, setFieldErrors] = useState<ExperienceFormErrors>({});
@@ -66,6 +73,7 @@ export default function Form() {
   const navigate = useNavigate();
   const templatePreviewRef = useRef<HTMLDialogElement>(null);
   const experiencePreviewRef = useRef<HTMLDialogElement>(null);
+  const heroImageInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
   const creatorId = useAuth((state) => state.user?.id);
   const formValues: ExperienceFormValues = {
@@ -76,10 +84,16 @@ export default function Form() {
     heartfeltMessage,
     quoteText: songLink,
     templateKey,
+    heroImageFile,
     paymentPhone: senderWhatsapp,
     paymentProvider: serviceProvider,
   };
   const availableTemplates = occasion === 'birthday' ? TEMPLATES_BY_OCCASION.birthday : [];
+
+  useEffect(() => {
+    if (!heroImagePreviewUrl) return;
+    return () => URL.revokeObjectURL(heroImagePreviewUrl);
+  }, [heroImagePreviewUrl]);
 
   useEffect(() => {
     const dialog = templatePreviewRef.current;
@@ -154,7 +168,8 @@ export default function Form() {
       senderName: creatorName,
       occasionLabel: 'CELEBRATING BIRTHDAY',
       title: `Happy Birthday, ${recipientName}!`,
-      summary: message,
+      heroImageUrl: heroImagePreviewUrl || undefined,
+      heroImageAlt: heroImageFile ? `Birthday celebration for ${recipientName}` : 'Birthday celebration illustration',
       letterDate: previewDate.toLocaleDateString(undefined, {
         month: 'long',
         day: 'numeric',
@@ -214,7 +229,13 @@ export default function Form() {
     setCopyError('');
     setLinkCopied(false);
     setIsSubmitting(true);
+    let uploadedHeroImagePath: string | undefined;
+    let draftSaved = false;
     try {
+      if (heroImageFile) {
+        uploadedHeroImagePath = await uploadExperienceImage(heroImageFile);
+      }
+
       const experience = await createExperienceDraft({
         creatorName,
         recipientName,
@@ -227,13 +248,23 @@ export default function Form() {
         themeMode: 'dark',
         paymentPhone: senderWhatsapp,
         paymentProvider: serviceProvider,
+        ...(uploadedHeroImagePath ? { heroImagePath: uploadedHeroImagePath } : {}),
       });
+      draftSaved = true;
       const privatePreviewUrl = `${window.location.origin}/experiences/${encodeURIComponent(experience.id)}/preview`;
       setSavedExperienceId(experience.id);
       setPreviewUrl(privatePreviewUrl);
       setShowSuccessModal(true);
       await queryClient.invalidateQueries({ queryKey: ['experiences'] });
     } catch (error) {
+      if (uploadedHeroImagePath && !draftSaved) {
+        try {
+          await deleteExperienceImage(uploadedHeroImagePath);
+        } catch (cleanupError) {
+          console.error('Unable to remove the unreferenced experience image:', cleanupError);
+        }
+      }
+
       const message = axios.isAxiosError<{ message?: string }>(error)
         ? error.response?.data?.message || error.message
         : 'We could not save your draft. Please try again.';
@@ -265,6 +296,8 @@ export default function Form() {
     setHeartfeltMessage('');
     setSongLink('');
     setTemplateKey('');
+    setHeroImageFile(null);
+    setHeroImagePreviewUrl('');
     setSenderWhatsapp('');
     setServiceProvider('');
     setFieldErrors({});
@@ -416,6 +449,62 @@ export default function Form() {
 
               {activeStep === 3 && (
                 <div className="step-form-fade-in form-fields-stack">
+                  <fieldset className="experience-image-upload">
+                    <legend className="color-palette-label">Add a photo (optional)</legend>
+                    <p id="hero-image-help" className="experience-image-help">
+                      This photo will appear in the birthday template. Use a JPEG, PNG, or WebP image up to 5 MB.
+                    </p>
+                    <input
+                      ref={heroImageInputRef}
+                      id="experience-hero-image"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      aria-label="Upload a birthday photo"
+                      aria-invalid={Boolean(fieldErrors.heroImageFile)}
+                      aria-describedby={fieldErrors.heroImageFile ? 'hero-image-error' : 'hero-image-help'}
+                      onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        if (!file) return;
+
+                        const error = validateExperienceImage(file);
+                        if (error) {
+                          setFieldErrors((current) => ({ ...current, heroImageFile: error }));
+                          event.target.value = '';
+                          return;
+                        }
+
+                        setHeroImageFile(file);
+                        setHeroImagePreviewUrl(URL.createObjectURL(file));
+                        clearFieldError('heroImageFile');
+                      }}
+                    />
+                    {fieldErrors.heroImageFile && (
+                      <p id="hero-image-error" className="form-field-error" role="alert">
+                        {fieldErrors.heroImageFile}
+                      </p>
+                    )}
+                    {heroImageFile && heroImagePreviewUrl && (
+                      <div className="experience-image-selected">
+                      <img src={heroImagePreviewUrl} alt={`Selected for ${recipientName}`} />
+                        <div>
+                          <span className="experience-image-filename">{heroImageFile.name}</span>
+                          <button
+                            type="button"
+                            className="experience-image-remove"
+                            onClick={() => {
+                              setHeroImageFile(null);
+                              setHeroImagePreviewUrl('');
+                              clearFieldError('heroImageFile');
+                              if (heroImageInputRef.current) heroImageInputRef.current.value = '';
+                            }}
+                          >
+                            Remove photo
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </fieldset>
+
                   <InputField
                     label="Send an inspirational quote(optional)"
                     multiline={false}
@@ -583,6 +672,7 @@ export default function Form() {
           </button>
           <BirthdayTemplate1
             className="template-picker-full-preview"
+            heroImageUrl={heroImagePreviewUrl || undefined}
             data={getExperiencePreviewData()}
             showCreateCta={false}
             onBack={() => setShowExperiencePreview(false)}

@@ -6,6 +6,7 @@ export interface ExperienceFormValues {
     heartfeltMessage: string;
     quoteText: string;
     templateKey: string;
+    heroImageFile: File | null;
     paymentPhone: string;
     paymentProvider: string;
 }
@@ -17,6 +18,21 @@ const MAX_MESSAGE_LENGTH = 10000;
 const MAX_QUOTE_LENGTH = 1000;
 const MAX_RELATIONSHIP_LENGTH = 120;
 const MAX_PHONE_LENGTH = 32;
+export const MAX_EXPERIENCE_IMAGE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_EXPERIENCE_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+export function validateExperienceImage(file: File): string | undefined {
+    if (!ALLOWED_EXPERIENCE_IMAGE_TYPES.has(file.type)) {
+        return 'Choose a JPEG, PNG, or WebP image.';
+    }
+    if (file.size === 0) {
+        return 'Choose an image that is not empty.';
+    }
+    if (file.size > MAX_EXPERIENCE_IMAGE_BYTES) {
+        return 'Choose an image smaller than 5 MB.';
+    }
+    return undefined;
+}
 
 export function normalizeGhanaMobileNumber(value: string): string {
     const compact = value.trim().replace(/[\s()-]/g, '');
@@ -71,6 +87,10 @@ export function validateExperienceFormStep(
         }
         if (values.templateKey !== 'birthday-template-1') {
             errors.templateKey = 'Preview and select the birthday template to continue.';
+        }
+        if (values.heroImageFile) {
+            const imageError = validateExperienceImage(values.heroImageFile);
+            if (imageError) errors.heroImageFile = imageError;
         }
     }
 

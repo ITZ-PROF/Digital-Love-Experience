@@ -8,7 +8,6 @@ export interface BirthdayTemplateData {
   senderName: string;
   occasionLabel: string;
   title: string;
-  summary: string;
   heroImageUrl: string;
   heroImageAlt: string;
   letterDate: string;
@@ -38,8 +37,6 @@ const SAMPLE_DATA: BirthdayTemplateData = {
   senderName: 'Thomas',
   occasionLabel: 'CELEBRATING THIRTY YEARS',
   title: 'Happy Birthday, Eleanor!',
-  summary:
-    'Today we celebrate the light you bring into our lives. This page is a small collection of thoughts, memories, and appreciation for the beautiful soul you are. May this year be your most wonderful journey yet.',
   heroImageUrl: templateImage,
   heroImageAlt: 'Colorful illustration of a birthday cake and gifts',
   letterDate: 'March 20th, 2026',
@@ -78,7 +75,6 @@ function BirthdayTemplate1({
     senderName,
     occasionLabel,
     title,
-    summary,
     heroImageAlt,
     letterDate,
     letterDateIso,
@@ -126,7 +122,9 @@ function BirthdayTemplate1({
               With all my love, <strong>{senderName}</strong>
             </span>
           </p>
-          <p className="hero-summary">{summary}</p>
+          <p className="hero-summary">
+            A personal DLE celebration made to honor the people and moments you love.
+          </p>
           <a className="scroll-prompt" href="#birthday-letter">
             Scroll down to read your message <span aria-hidden="true">∨</span>
           </a>

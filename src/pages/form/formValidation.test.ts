@@ -1,6 +1,8 @@
 import {
     isValidGhanaMobileNumber,
+    MAX_EXPERIENCE_IMAGE_BYTES,
     normalizeGhanaMobileNumber,
+    validateExperienceImage,
     validateExperienceFormStep,
     ExperienceFormValues,
 } from './formValidation';
@@ -13,6 +15,7 @@ const validForm: ExperienceFormValues = {
     heartfeltMessage: 'Happy birthday, wishing you a wonderful year!',
     quoteText: '',
     templateKey: 'birthday-template-1',
+    heroImageFile: null,
     paymentPhone: '024 123 4567',
     paymentProvider: 'momo',
 };
@@ -48,4 +51,25 @@ test('validates provider and Ghana mobile numbers for mobile money', () => {
     expect(isValidGhanaMobileNumber('+233 24 123 4567')).toBe(true);
     expect(isValidGhanaMobileNumber('12345')).toBe(false);
     expect(validateExperienceFormStep(4, { ...validForm, paymentProvider: 'card', paymentPhone: '' })).toEqual({});
+});
+
+test('accepts supported image types within the upload size limit', () => {
+    const image = new File(['image'], 'birthday.png', { type: 'image/png' });
+    expect(validateExperienceImage(image)).toBeUndefined();
+    expect(validateExperienceFormStep(3, { ...validForm, heroImageFile: image })).toEqual({});
+});
+
+test('rejects unsupported, empty, and oversized images', () => {
+    const unsupported = new File(['image'], 'birthday.gif', { type: 'image/gif' });
+    const empty = new File([], 'birthday.png', { type: 'image/png' });
+    const oversized = new File(
+        [new Uint8Array(MAX_EXPERIENCE_IMAGE_BYTES + 1)],
+        'birthday.png',
+        { type: 'image/png' }
+    );
+
+    expect(validateExperienceImage(unsupported)).toMatch(/JPEG, PNG, or WebP/);
+    expect(validateExperienceFormStep(3, { ...validForm, heroImageFile: unsupported })).toHaveProperty('heroImageFile');
+    expect(validateExperienceImage(empty)).toMatch(/not empty/);
+    expect(validateExperienceImage(oversized)).toMatch(/smaller than 5 MB/);
 });

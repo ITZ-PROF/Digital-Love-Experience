@@ -22,7 +22,10 @@ function getPreviewData(experience: Awaited<ReturnType<typeof getExperienceDraft
         title: occasion.toLowerCase() === 'birthday'
             ? `Happy Birthday, ${recipientName}!`
             : `A special ${occasion} for ${recipientName}!`,
-        summary: message || 'A message made with love.',
+        heroImageUrl: experience.heroImageUrl || undefined,
+        heroImageAlt: experience.heroImageUrl
+            ? `Uploaded birthday photo for ${recipientName}`
+            : 'Birthday celebration illustration',
         letterDate: createdAt.toLocaleDateString(undefined, {
             month: 'long',
             day: 'numeric',

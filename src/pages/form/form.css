@@ -290,6 +290,93 @@
   margin-top: 8px;
 }
 
+.experience-image-upload {
+  min-width: 0;
+  margin: 4px 0 18px;
+  padding: 14px;
+  border: 1px solid #e8dada;
+  border-radius: 12px;
+  background: #fffdfc;
+}
+
+.experience-image-upload legend {
+  padding: 0 5px;
+  color: #333333;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.experience-image-help {
+  margin: 2px 0 12px;
+  color: #68605e;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.experience-image-upload input[type="file"] {
+  display: block;
+  width: 100%;
+  color: #494342;
+  font: inherit;
+  font-size: 13px;
+}
+
+.experience-image-upload input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 9px 13px;
+  border: 1px solid #7d0b11;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #7d0b11;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.experience-image-selected {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.experience-image-selected img {
+  width: 108px;
+  height: 84px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.experience-image-selected > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.experience-image-filename {
+  max-width: 100%;
+  overflow: hidden;
+  color: #494342;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.experience-image-remove {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #7d0b11;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .template-option {
   display: flex;
   gap: 18px;

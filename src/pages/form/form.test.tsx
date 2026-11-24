@@ -10,6 +10,8 @@ const originalShowModal = HTMLDialogElement.prototype.showModal;
 const originalClose = HTMLDialogElement.prototype.close;
 
 beforeEach(() => {
+  URL.createObjectURL = jest.fn(() => 'blob:experience-photo');
+  URL.revokeObjectURL = jest.fn();
   HTMLDialogElement.prototype.showModal = function showModal() {
     this.setAttribute('open', '');
   };
@@ -52,6 +54,12 @@ test('previews the filled birthday experience before showing payment details', (
   });
   fireEvent.click(screen.getByRole('button', { name: 'Next' }));
 
+  const image = new File(['birthday photo'], 'birthday.png', { type: 'image/png' });
+  fireEvent.change(screen.getByLabelText('Upload a birthday photo'), {
+    target: { files: [image] },
+  });
+  expect(screen.getByAltText('Selected for Sam Recipient')).toHaveAttribute('src', 'blob:experience-photo');
+
   fireEvent.click(screen.getByRole('button', { name: /view the full birthday letter template/i }));
   fireEvent.click(screen.getByRole('button', { name: 'Use this template' }));
 
@@ -62,9 +70,13 @@ test('previews the filled birthday experience before showing payment details', (
   fireEvent.click(screen.getByRole('button', { name: 'Proceed To Preview' }));
 
   expect(screen.getByRole('heading', { name: 'Happy Birthday, Sam Recipient!' })).toBeInTheDocument();
-  const preview = screen.getAllByRole('main')[1];
+  const preview = screen.getByRole('dialog', { name: 'Your birthday experience' });
+  expect(preview.querySelector('.hero-image-frame')).toHaveAttribute('alt', 'Birthday celebration for Sam Recipient');
+  expect(preview.querySelector('.hero-image-frame')).toHaveAttribute('src', 'blob:experience-photo');
   expect(preview).toHaveTextContent(/With all my love,\s*Alex Creator/);
-  expect(preview).toHaveTextContent(/Happy birthday, Sam!\s+Wishing you a wonderful year/);
+  expect(preview).toHaveTextContent('A personal DLE celebration made to honor the people and moments you love.');
+  expect(screen.getByText('Happy birthday, Sam!', { selector: '.letter-content p' })).toBeInTheDocument();
+  expect(screen.getByText('Wishing you a wonderful year.', { selector: '.letter-content p' })).toBeInTheDocument();
   expect(screen.getByLabelText('A birthday letter for Sam Recipient')).toHaveTextContent('Dear Sam Recipient,');
   expect(screen.getByRole('button', { name: 'Continue to payment details' })).toBeInTheDocument();
 
