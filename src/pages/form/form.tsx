@@ -8,7 +8,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { createExperienceDraft } from '../../services/experience.service';
 import { useAuth } from '../../stores/authstore';
-import BirthdayTemplate1 from '../../components/templates/birthdaytemplate1/BirthdayTemplate1';
+import BirthdayTemplate1, {
+  BirthdayTemplateData,
+} from '../../components/templates/birthdaytemplate1/BirthdayTemplate1';
 import birthdayTemplateThumbnail from '../../assets/templateimage.svg';
 import {
   ExperienceFormErrors,
@@ -54,6 +56,7 @@ export default function Form() {
   const [fieldErrors, setFieldErrors] = useState<ExperienceFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showTemplatePreview, setShowTemplatePreview] = useState(false);
+  const [showExperiencePreview, setShowExperiencePreview] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
   const [savedExperienceId, setSavedExperienceId] = useState('');
@@ -62,6 +65,7 @@ export default function Form() {
   const [submitError, setSubmitError] = useState('');
   const navigate = useNavigate();
   const templatePreviewRef = useRef<HTMLDialogElement>(null);
+  const experiencePreviewRef = useRef<HTMLDialogElement>(null);
   const queryClient = useQueryClient();
   const creatorId = useAuth((state) => state.user?.id);
   const formValues: ExperienceFormValues = {
@@ -83,10 +87,25 @@ export default function Form() {
 
     if (showTemplatePreview && !dialog.open) {
       dialog.showModal();
-    } else if (!showTemplatePreview && dialog.open) {
-      dialog.close();
     }
+
+    return () => {
+      if (dialog.open) dialog.close();
+    };
   }, [showTemplatePreview]);
+
+  useEffect(() => {
+    const dialog = experiencePreviewRef.current;
+    if (!dialog) return;
+
+    if (showExperiencePreview && !dialog.open) {
+      dialog.showModal();
+    }
+
+    return () => {
+      if (dialog.open) dialog.close();
+    };
+  }, [showExperiencePreview]);
 
   const validateSteps = (steps: number[]) => {
     const errors: ExperienceFormErrors = {};
@@ -120,7 +139,50 @@ export default function Form() {
     }
   };
 
+  const handleProceedToPreview = () => {
+    if (validateSteps([1, 2, 3])) {
+      setShowExperiencePreview(true);
+    }
+  };
+
+  const getExperiencePreviewData = (): Partial<BirthdayTemplateData> => {
+    const message = heartfeltMessage.trim();
+    const previewDate = new Date();
+
+    return {
+      recipientName,
+      senderName: creatorName,
+      occasionLabel: 'CELEBRATING BIRTHDAY',
+      title: `Happy Birthday, ${recipientName}!`,
+      summary: message,
+      letterDate: previewDate.toLocaleDateString(undefined, {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      }),
+      letterDateIso: previewDate.toISOString().slice(0, 10),
+      letterGreeting: `Dear ${recipientName},`,
+      letterParagraphs: message.split(/\n{2,}/).filter(Boolean),
+      letterSignoff: 'With love,',
+      quoteNumber: '01',
+      quoteText: songLink.trim(),
+      quoteAuthor: '',
+      closingTitle: `A special moment made for ${recipientName}.`,
+      copyright: [`Made with love for ${recipientName}.`],
+    };
+  };
+
+  const continueToPaymentDetails = () => {
+    setShowExperiencePreview(false);
+    setActiveStep(4);
+  };
+
   const handleStepNavigation = (targetStep: number) => {
+    if (targetStep === 4 && activeStep < 4) {
+      handleProceedToPreview();
+      return;
+    }
+
     if (targetStep <= activeStep) {
       setActiveStep(targetStep);
       return;
@@ -455,7 +517,13 @@ export default function Form() {
               <button
                 type="button"
                 className="action-link-btn next"
-                onClick={activeStep === STEPS.length ? handleSaveDraft : handleNext}
+                onClick={
+                  activeStep === STEPS.length
+                    ? handleSaveDraft
+                    : activeStep === 3
+                      ? handleProceedToPreview
+                      : handleNext
+                }
                 disabled={isSubmitting}
               >
                 <span>{activeStep === STEPS.length ? 'Save Draft' : activeStep === 3 ? 'Proceed To Preview' : 'Next'}</span>
@@ -493,6 +561,39 @@ export default function Form() {
             </div>
             <button type="button" className="template-select-button" onClick={selectBirthdayTemplate}>
               Use this template
+            </button>
+          </footer>
+        </dialog>
+      )}
+
+      {showExperiencePreview && (
+        <dialog
+          ref={experiencePreviewRef}
+          className="template-preview-dialog"
+          aria-labelledby="experience-preview-title"
+          onClose={() => setShowExperiencePreview(false)}
+        >
+          <button
+            type="button"
+            className="template-preview-close"
+            autoFocus
+            onClick={() => setShowExperiencePreview(false)}
+          >
+            Close preview
+          </button>
+          <BirthdayTemplate1
+            className="template-picker-full-preview"
+            data={getExperiencePreviewData()}
+            showCreateCta={false}
+            onBack={() => setShowExperiencePreview(false)}
+          />
+          <footer className="template-preview-footer">
+            <div>
+              <h2 id="experience-preview-title">Your birthday experience</h2>
+              <p>Review your message and design before continuing to payment details.</p>
+            </div>
+            <button type="button" className="template-select-button" onClick={continueToPaymentDetails}>
+              Continue to payment details
             </button>
           </footer>
         </dialog>
