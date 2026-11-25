@@ -44,6 +44,7 @@ const SLIDER_IMAGES = [
 function HeroSection() {
   const [rotation, setRotation] = useState(0);
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+  const [isDraggingEffect, setIsDraggingEffect] = useState(false);
   const isDragging = useRef(false);
   const startX = useRef(0);
   const startRotation = useRef(0);
@@ -62,33 +63,30 @@ function HeroSection() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (isMobileOrTablet) return; // Prevent calculations when viewing grid
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
     isDragging.current = true;
+    setIsDraggingEffect(true);
     startX.current = e.clientX;
     startRotation.current = rotation;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    e.preventDefault();
   };
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging.current || isMobileOrTablet) return;
-      const deltaX = e.clientX - startX.current;
-      const newRotation = startRotation.current - deltaX / 6;
-      setRotation(newRotation);
-    };
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDragging.current || isMobileOrTablet) return;
+    const deltaX = e.clientX - startX.current;
+    setRotation(startRotation.current - deltaX / 6);
+  };
 
-    const handleMouseUp = () => {
-      isDragging.current = false;
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [rotation, isMobileOrTablet]);
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+    isDragging.current = false;
+    setIsDraggingEffect(false);
+  };
 
   return (
     <section className="hero-section">
@@ -111,8 +109,17 @@ function HeroSection() {
         </div>
       ) : (
         /* 3D Concave Panorama Slider Container preserved natively */
-        <div className="panorama-container" onMouseDown={handleMouseDown}>
-          <div className="panorama-carousel" style={{ transform: `rotateY(${rotation}deg)` }}>
+        <div
+          className="panorama-container"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+        >
+          <div
+            className={`panorama-carousel${isDraggingEffect ? ' is-dragging' : ''}`}
+            style={{ transform: `rotateY(${rotation}deg)` }}
+          >
             {SLIDER_IMAGES.map((src, index) => {
               const centerOffset = (totalItems - 1) / 2;
               const itemAngle = (index - centerOffset) * angleStep;

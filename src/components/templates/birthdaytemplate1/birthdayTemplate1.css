@@ -18,6 +18,23 @@
   font-family: var(--font-primary);
 }
 
+.birthday-template-container.experience-color-green {
+  --birthday-red: #28623c;
+  --birthday-gold: #85a98d;
+}
+
+.birthday-template-container.experience-color-olive {
+  --birthday-red: #666619;
+  --birthday-gold: #a4a46f;
+}
+
+.birthday-template-container.experience-theme-dark {
+  --birthday-paper: #1d1b25;
+  --birthday-ink: #f7f1ec;
+  --birthday-body: #ddd3ce;
+  --birthday-muted: #c3b9b3;
+}
+
 .birthday-template-container *,
 .birthday-template-container *::before,
 .birthday-template-container *::after {

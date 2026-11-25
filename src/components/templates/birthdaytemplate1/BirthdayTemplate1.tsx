@@ -8,7 +8,6 @@ export interface BirthdayTemplateData {
   senderName: string;
   occasionLabel: string;
   title: string;
-  summary: string;
   heroImageUrl: string;
   heroImageAlt: string;
   letterDate: string;
@@ -28,6 +27,9 @@ export interface BirthdayTemplateProps {
   className?: string;
   heroImageUrl?: string;
   onCreateExperience?: () => void;
+  onBack?: () => void;
+  data?: Partial<BirthdayTemplateData>;
+  showCreateCta?: boolean;
 }
 
 const SAMPLE_DATA: BirthdayTemplateData = {
@@ -35,8 +37,6 @@ const SAMPLE_DATA: BirthdayTemplateData = {
   senderName: 'Thomas',
   occasionLabel: 'CELEBRATING THIRTY YEARS',
   title: 'Happy Birthday, Eleanor!',
-  summary:
-    'Today we celebrate the light you bring into our lives. This page is a small collection of thoughts, memories, and appreciation for the beautiful soul you are. May this year be your most wonderful journey yet.',
   heroImageUrl: templateImage,
   heroImageAlt: 'Colorful illustration of a birthday cake and gifts',
   letterDate: 'March 20th, 2026',
@@ -59,15 +59,22 @@ const SAMPLE_DATA: BirthdayTemplateData = {
 };
 function BirthdayTemplate1({
   className = '',
-  heroImageUrl = SAMPLE_DATA.heroImageUrl,
+  heroImageUrl,
   onCreateExperience,
+  onBack,
+  data,
+  showCreateCta = true,
 }: BirthdayTemplateProps) {
+  const content: BirthdayTemplateData = {
+    ...SAMPLE_DATA,
+    ...data,
+    heroImageUrl: heroImageUrl ?? data?.heroImageUrl ?? SAMPLE_DATA.heroImageUrl,
+  };
   const {
     recipientName,
     senderName,
     occasionLabel,
     title,
-    summary,
     heroImageAlt,
     letterDate,
     letterDateIso,
@@ -80,7 +87,7 @@ function BirthdayTemplate1({
     closingTitle,
     buttonLabel,
     copyright,
-  } = SAMPLE_DATA;
+  } = content;
   const senderInitial = senderName.charAt(0);
 
   const navigate = useNavigate();
@@ -91,7 +98,13 @@ function BirthdayTemplate1({
         <button
           className="hero-back-button"
           type="button"
-          onClick={() => navigate('/')}
+          onClick={() => {
+            if (onBack) {
+              onBack();
+              return;
+            }
+            navigate('/');
+          }}
         >
           <span aria-hidden="true">←</span> Back
         </button>
@@ -109,7 +122,9 @@ function BirthdayTemplate1({
               With all my love, <strong>{senderName}</strong>
             </span>
           </p>
-          <p className="hero-summary">{summary}</p>
+          <p className="hero-summary">
+            A personal DLE celebration made to honor the people and moments you love.
+          </p>
           <a className="scroll-prompt" href="#birthday-letter">
             Scroll down to read your message <span aria-hidden="true">∨</span>
           </a>
@@ -143,30 +158,36 @@ function BirthdayTemplate1({
         </article>
       </section>
 
-      <section className="quote-section" aria-labelledby="birthday-quote">
-        <p className="quote-index">{quoteNumber}</p>
-        <blockquote id="birthday-quote">
-          <p>&quot;{quoteText}&quot;</p>
-          <footer className="quote-attribution">
-            <span aria-hidden="true" />
-            <cite>{quoteAuthor}</cite>
-            <span aria-hidden="true" />
-          </footer>
-        </blockquote>
-      </section>
+      {quoteText && (
+        <section className="quote-section" aria-labelledby="birthday-quote">
+          <p className="quote-index">{quoteNumber}</p>
+          <blockquote id="birthday-quote">
+            <p>&quot;{quoteText}&quot;</p>
+            {quoteAuthor && (
+              <footer className="quote-attribution">
+                <span aria-hidden="true" />
+                <cite>{quoteAuthor}</cite>
+                <span aria-hidden="true" />
+              </footer>
+            )}
+          </blockquote>
+        </section>
+      )}
 
-      <section className="birthday-footer">
-        <p className="footer-kicker">Want to surprise someone special?</p>
-        <h2>{closingTitle}</h2>
-        <button className="btn-primary" type="button" onClick={() => {
-          if (onCreateExperience) {
-            onCreateExperience();
-          } else {
-            navigate('/form');
-          }}}>
-          {buttonLabel}
-        </button>
-      </section>
+      {showCreateCta && (
+        <section className="birthday-footer">
+          <p className="footer-kicker">Want to surprise someone special?</p>
+          <h2>{closingTitle}</h2>
+          <button className="btn-primary" type="button" onClick={() => {
+            if (onCreateExperience) {
+              onCreateExperience();
+            } else {
+              navigate('/form');
+            }}}>
+            {buttonLabel}
+          </button>
+        </section>
+      )}
 
       <footer className="birthday-copyright">
         {copyright.map((line) => (

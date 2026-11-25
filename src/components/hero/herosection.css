@@ -56,6 +56,8 @@
   align-items: center;
   justify-content: center;
   margin-top: 20px;
+  touch-action: pan-y;
+  user-select: none;
 }
 
 .panorama-container:active {
@@ -71,6 +73,10 @@
   align-items: center;
   justify-content: center;
   transition: transform 0.15s ease-out; /* Keeps dragging responsive but silky smooth */
+}
+
+.panorama-carousel.is-dragging {
+  transition: none;
 }
 
 .panorama-item {
