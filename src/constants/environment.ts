@@ -6,7 +6,7 @@ if (!apiUrl) {
 }
 
 const environment = {
-    env: process.env.NODE_ENV || 'development',
+    env: process.env.NODE_ENV || 'production',
 
     api: {
         url: apiUrl,
