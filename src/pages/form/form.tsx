@@ -2,14 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import './form.css';
 import InputField from '../../components/inputfield/input';
 import logo from '../../assets/logo_variant_2.svg'
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import LoadingPage from '../../components/loadingpage/loader';
 import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import {
   createExperienceDraft,
   deleteExperienceImage,
+  Experience,
   initializeExperiencePayment,
+  savePendingPaystackContext,
   uploadExperienceImage,
 } from '../../services/experience.service';
 import { useAuth } from '../../stores/authstore';
@@ -63,28 +65,40 @@ const TEMPLATES_BY_OCCASION: Record<string, TemplateOption[]> = {
   ],
 };
 
+interface PaymentReturnLocationState {
+  paymentReturn?: {
+    experience: Experience;
+    shareUrl: string;
+  };
+}
+
 export default function Form() {
-  const [activeStep, setActiveStep] = useState<number>(1);
-  const [creatorName, setCreatorName] = useState('');
-  const [paymentProvider, setPaymentProvider] = useState('');
-  const [occasion, setOccasion] = useState<string>('');
-  const [recipientName, setRecipientName] = useState('');
-  const [recipientWhatsapp, setRecipientWhatsapp] = useState('');
-  const [heartfeltMessage, setHeartfeltMessage] = useState('');
-  const [songLink, setSongLink] = useState('');
-  const [templateKey, setTemplateKey] = useState('');
+  const location = useLocation();
+  const paymentReturn = (location.state as PaymentReturnLocationState | null)?.paymentReturn;
+  const [activeStep, setActiveStep] = useState<number>(paymentReturn ? 4 : 1);
+  const [creatorName, setCreatorName] = useState(paymentReturn?.experience.creatorName ?? '');
+  const [paymentProvider, setPaymentProvider] = useState(paymentReturn?.experience.paymentProvider ?? '');
+  const [occasion, setOccasion] = useState<string>(paymentReturn?.experience.occasion ?? '');
+  const [recipientName, setRecipientName] = useState(paymentReturn?.experience.recipientName ?? '');
+  const [recipientWhatsapp, setRecipientWhatsapp] = useState(paymentReturn?.experience.recipientRelationship ?? '');
+  const [heartfeltMessage, setHeartfeltMessage] = useState(paymentReturn?.experience.heartfeltMessage ?? '');
+  const [songLink, setSongLink] = useState(paymentReturn?.experience.quoteText ?? '');
+  const [templateKey, setTemplateKey] = useState(paymentReturn?.experience.templateKey ?? '');
   const [templateBeingPreviewed, setTemplateBeingPreviewed] = useState('');
-  const [selectedColor, setSelectedColor] = useState('purple');
-  const [themeMode, setThemeMode] = useState('dark');
+  const [selectedColor, setSelectedColor] = useState(paymentReturn?.experience.selectedColor ?? 'purple');
+  const [themeMode, setThemeMode] = useState(paymentReturn?.experience.themeMode ?? 'dark');
   const [heroImageFile, setHeroImageFile] = useState<File | null>(null);
-  const [heroImagePreviewUrl, setHeroImagePreviewUrl] = useState('');
+  const [heroImagePreviewUrl, setHeroImagePreviewUrl] = useState(paymentReturn?.experience.heroImageUrl ?? '');
   const [fieldErrors, setFieldErrors] = useState<ExperienceFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showTemplatePreview, setShowTemplatePreview] = useState(false);
   const [showExperiencePreview, setShowExperiencePreview] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(Boolean(paymentReturn));
+  const [isPaymentComplete, setIsPaymentComplete] = useState(Boolean(paymentReturn));
+  const [shareUrl, setShareUrl] = useState(paymentReturn?.shareUrl ?? '');
+  const [shareToken, setShareToken] = useState(paymentReturn?.experience.shareToken ?? '');
   const [previewUrl, setPreviewUrl] = useState('');
-  const [savedExperienceId, setSavedExperienceId] = useState('');
+  const [savedExperienceId, setSavedExperienceId] = useState(paymentReturn?.experience.id ?? '');
   const [linkCopied, setLinkCopied] = useState(false);
   const [copyError, setCopyError] = useState('');
   const [submitError, setSubmitError] = useState('');
@@ -251,6 +265,8 @@ export default function Form() {
   };
 
   const handleStepNavigation = (targetStep: number) => {
+    if (isPaymentComplete) return;
+
     if (targetStep === 4 && activeStep < 4) {
       handleProceedToPreview();
       return;
@@ -267,6 +283,11 @@ export default function Form() {
   };
 
   const handleBack = () => {
+    if (isPaymentComplete) {
+      navigate('/dashboard');
+      return;
+    }
+
     if (activeStep > 1){
 
         setActiveStep((prev) => prev - 1)
@@ -314,6 +335,7 @@ export default function Form() {
     try {
       const experienceId = await ensureDraftSaved();
       const checkout = await initializeExperiencePayment(experienceId);
+      savePendingPaystackContext(experienceId, checkout.reference);
       window.location.assign(checkout.authorizationUrl);
     } catch (error) {
       const message = axios.isAxiosError<{ message?: string }>(error)
@@ -327,7 +349,7 @@ export default function Form() {
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(previewUrl);
+      await navigator.clipboard.writeText(isPaymentComplete ? shareUrl : previewUrl);
       setLinkCopied(true);
       setCopyError('');
     } catch (error) {
@@ -339,6 +361,9 @@ export default function Form() {
 
   const handleCreateAnother = () => {
     setShowSuccessModal(false);
+    setIsPaymentComplete(false);
+    setShareUrl('');
+    setShareToken('');
     setActiveStep(1);
     setCreatorName('');
     setPaymentProvider('');
@@ -399,6 +424,7 @@ export default function Form() {
                   key={step.id} 
                   className={`step-item-row ${isActive ? 'is-active' : ''} ${isCompleted ? 'is-completed' : ''}`}
                   onClick={() => handleStepNavigation(step.id)}
+                  disabled={isPaymentComplete && step.id !== 4}
                   aria-current={isActive ? 'step' : undefined}
                   aria-label={`Go to step ${step.id}: ${step.title}`}
                 >
@@ -659,7 +685,13 @@ export default function Form() {
                 </div>
               )}
 
-              {activeStep === 4 && (
+              {activeStep === 4 && isPaymentComplete && (
+                <div className="payment-notice" role="status">
+                  <strong>Payment confirmed</strong>
+                  <p>Your experience is live and ready to share. Use the link in the confirmation window or open it directly.</p>
+                </div>
+              )}
+              {activeStep === 4 && !isPaymentComplete && (
                 <div className="step-form-fade-in form-fields-stack">
                   <div className="payment-notice" role="status">
                     <strong>Pay securely with Paystack</strong>
@@ -708,7 +740,7 @@ export default function Form() {
               >
                 <span>Back</span>
               </button>
-              {activeStep === STEPS.length && (
+              {activeStep === STEPS.length && !isPaymentComplete && (
                 <button
                   type="button"
                   className="action-link-btn save-draft"
@@ -718,24 +750,34 @@ export default function Form() {
                   <span>Save Draft</span>
                 </button>
               )}
-              <button
-                type="button"
-                className="action-link-btn next"
-                onClick={
-                  activeStep === STEPS.length
-                    ? handleProceedToPaystack
-                    : activeStep === 3
-                      ? handleProceedToPreview
-                      : handleNext
-                }
-                disabled={isSubmitting}
-              >
-                <span>
-                  {activeStep === STEPS.length
-                    ? 'Continue to Paystack'
-                    : activeStep === 3 ? 'Proceed To Preview' : 'Next'}
-                </span>
-              </button>
+              {isPaymentComplete ? (
+                <button
+                  type="button"
+                  className="action-link-btn next"
+                  onClick={() => navigate('/dashboard')}
+                >
+                  <span>Go to dashboard</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="action-link-btn next"
+                  onClick={
+                    activeStep === STEPS.length
+                      ? handleProceedToPaystack
+                      : activeStep === 3
+                        ? handleProceedToPreview
+                        : handleNext
+                  }
+                  disabled={isSubmitting}
+                >
+                  <span>
+                    {activeStep === STEPS.length
+                      ? 'Continue to Paystack'
+                      : activeStep === 3 ? 'Proceed To Preview' : 'Next'}
+                  </span>
+                </button>
+              )}
             </footer>
 
           </div>
@@ -833,42 +875,59 @@ export default function Form() {
             </button>
 
             <div className="success-confetti-art" aria-hidden="true" />
-            <h2 id="experience-success-title">Draft saved</h2>
+            <h2 id="experience-success-title">
+              {isPaymentComplete ? 'Your experience is ready to share' : 'Draft saved'}
+            </h2>
             <p className="experience-success-copy">
-              Your draft is saved privately. You can continue to Paystack checkout from your dashboard whenever you’re ready.
+              {isPaymentComplete
+                ? 'Payment confirmed. Your experience is live and anyone with this link can view it.'
+                : 'Your draft is saved privately. You can continue to Paystack checkout from your dashboard whenever you’re ready.'}
             </p>
 
             <div className="experience-share-row">
-              <span className="experience-share-link" title={previewUrl}>
+              <span className="experience-share-link" title={isPaymentComplete ? shareUrl : previewUrl}>
                 <span aria-hidden="true">↗</span>
-                {previewUrl}
+                {isPaymentComplete ? shareUrl : previewUrl}
               </span>
               <button
                 type="button"
                 className="experience-copy-button"
                 onClick={handleCopyLink}
-                aria-label={linkCopied ? 'Preview link copied' : 'Copy preview link'}
+                aria-label={linkCopied
+                  ? (isPaymentComplete ? 'Share link copied' : 'Preview link copied')
+                  : (isPaymentComplete ? 'Copy share link' : 'Copy preview link')}
               >
                 {linkCopied ? '✓' : '▢'}
               </button>
             </div>
             <p className={`experience-copy-status ${copyError ? 'is-error' : ''}`} aria-live="polite">
               {copyError || (linkCopied
-                ? 'Private preview link copied'
-                : 'Only you can open this preview')}
+                ? (isPaymentComplete ? 'Public share link copied' : 'Private preview link copied')
+                : (isPaymentComplete ? 'Anyone with the link can view this experience' : 'Only you can open this preview'))}
             </p>
 
             <button type="button" className="experience-create-new" onClick={handleCreateAnother}>
               Create A New Experience
             </button>
-            <button
-              type="button"
-              className="experience-view-button"
-              onClick={() => navigate(`/experiences/${encodeURIComponent(savedExperienceId)}/preview`)}
-              disabled={!savedExperienceId}
-            >
-              Preview Draft
-            </button>
+            {isPaymentComplete ? (
+              <button
+                type="button"
+                className="experience-view-button"
+                onClick={() => navigate(`/share/${encodeURIComponent(shareToken)}`)}
+                disabled={!shareToken}
+              >
+                Open share page
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="experience-view-button"
+                onClick={() => navigate(`/experiences/${encodeURIComponent(savedExperienceId)}/preview`)}
+                disabled={!savedExperienceId}
+              >
+                Preview Draft
+              </button>
+            )}
           </section>
         </div>
       )}

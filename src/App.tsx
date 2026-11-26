@@ -104,7 +104,7 @@ function Applive() {
             path="/experiences/:id/preview"
             element={<RequireAuth><ExperiencePreview /></RequireAuth>}
           />
-          <Route path="/share/:id" element={<SharedExperiencePage />} />
+          <Route path="/share/:token" element={<SharedExperiencePage />} />
           
           {/* Dedicated Authentication Route */}
           <Route path="/login" element={<Login />} />

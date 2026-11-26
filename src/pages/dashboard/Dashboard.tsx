@@ -7,6 +7,7 @@ import {
   Experience,
   initializeExperiencePayment,
   listExperienceDrafts,
+  savePendingPaystackContext,
 } from '../../services/experience.service';
 import { useAuth } from '../../stores/authstore';
 import './dashboard.css';
@@ -29,6 +30,7 @@ function ExperienceCard({ experience }: { experience: Experience }) {
     setIsStartingPayment(true);
     try {
       const checkout = await initializeExperiencePayment(experience.id);
+      savePendingPaystackContext(experience.id, checkout.reference);
       window.location.assign(checkout.authorizationUrl);
     } catch (error) {
       setPaymentError(getLoadError(error));

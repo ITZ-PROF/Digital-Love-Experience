@@ -60,8 +60,8 @@ export default function Login() {
                 setFeedback({ type: 'error', message: 'Enter your password.' });
                 return false;
             }
-            if (!isExistingUser && !isResetting && password.length < 12) {
-                setFeedback({ type: 'error', message: 'Use a password with at least 12 characters.' });
+            if (!isExistingUser && !isResetting && [...password].length < 8) {
+                setFeedback({ type: 'error', message: 'Use a password with at least 8 characters.' });
                 return false;
             }
         }
