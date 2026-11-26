@@ -132,7 +132,7 @@ function BirthdayTemplate1({
 
         <img
           className="hero-image-frame"
-          src={heroImageUrl}
+          src={content.heroImageUrl}
           alt={heroImageAlt}
         />
       </section>
