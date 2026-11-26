@@ -22,8 +22,8 @@ export default function ResetPassword() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (password.length < 12) {
-      setFeedback({ type: 'error', message: 'Use a password with at least 12 characters.' });
+    if ([...password].length < 8) {
+      setFeedback({ type: 'error', message: 'Use a password with at least 8 characters.' });
       return;
     }
     if (password !== confirmPassword) {

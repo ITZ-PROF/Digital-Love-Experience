@@ -2,14 +2,20 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Form from './form';
 
+const mockNavigate = jest.fn();
+let mockLocationState: unknown = null;
+
 jest.mock('react-router-dom', () => ({
-  useNavigate: () => jest.fn(),
+  useNavigate: () => mockNavigate,
+  useLocation: () => ({ state: mockLocationState }),
 }));
 
 const originalShowModal = HTMLDialogElement.prototype.showModal;
 const originalClose = HTMLDialogElement.prototype.close;
 
 beforeEach(() => {
+  mockNavigate.mockClear();
+  mockLocationState = null;
   URL.createObjectURL = jest.fn(() => 'blob:experience-photo');
   URL.revokeObjectURL = jest.fn();
   HTMLDialogElement.prototype.showModal = function showModal() {
@@ -90,4 +96,51 @@ test('previews the filled birthday experience before showing payment details', (
   fireEvent.change(screen.getByLabelText('Preferred Payment Method'), { target: { value: 'momo' } });
   expect(screen.queryByLabelText('Mobile Money Number')).not.toBeInTheDocument();
   expect(screen.getByText(/Paystack collects the required payment details there/i)).toBeInTheDocument();
+});
+
+test('returns paid experience to the payment step with its public share link', () => {
+  const publicUrl = 'https://digitalloveexperience.netlify.app/share/share-token';
+  mockLocationState = {
+    paymentReturn: {
+      shareUrl: publicUrl,
+      experience: {
+        id: 'experience-1',
+        creatorId: 'creator-1',
+        creatorName: 'Alex Creator',
+        recipientName: 'Sam Recipient',
+        recipientRelationship: null,
+        occasion: 'birthday',
+        templateKey: 'birthday-template-1',
+        heroImagePath: null,
+        heartfeltMessage: 'Happy birthday!',
+        quoteText: null,
+        selectedColor: 'purple',
+        themeMode: 'dark',
+        paymentPhone: null,
+        paymentProvider: 'card',
+        isPaymentSimulated: false,
+        shareToken: 'share-token',
+        status: 'ACTIVE',
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      },
+    },
+  };
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+
+  render(
+    <QueryClientProvider client={queryClient}>
+      <Form />
+    </QueryClientProvider>
+  );
+
+  expect(screen.getByRole('heading', { name: 'Payment Details' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Your experience is ready to share' })).toBeInTheDocument();
+  expect(screen.getByText(publicUrl)).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Continue to Paystack' })).not.toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole('button', { name: 'Open share page' }));
+  expect(mockNavigate).toHaveBeenCalledWith('/share/share-token');
 });

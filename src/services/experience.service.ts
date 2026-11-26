@@ -93,6 +93,13 @@ export interface PaystackVerification {
     paymentStatus: 'SUCCESS' | 'PENDING' | 'FAILED';
 }
 
+const PENDING_PAYSTACK_CONTEXT_KEY = 'dle.pendingPaystackContext';
+
+interface PendingPaystackContext {
+    experienceId: string;
+    reference: string;
+}
+
 interface PaystackCheckoutResponse {
     status: string;
     data: PaystackCheckout;
@@ -145,6 +152,33 @@ export async function initializeExperiencePayment(
         {}
     );
     return response.data.data;
+}
+
+export function savePendingPaystackContext(experienceId: string, reference: string): void {
+    const context: PendingPaystackContext = { experienceId, reference };
+    window.sessionStorage.setItem(PENDING_PAYSTACK_CONTEXT_KEY, JSON.stringify(context));
+}
+
+export function getPendingPaystackExperienceId(reference: string): string | null {
+    try {
+        const storedContext = window.sessionStorage.getItem(PENDING_PAYSTACK_CONTEXT_KEY);
+        if (!storedContext) return null;
+
+        const parsed: unknown = JSON.parse(storedContext);
+        if (typeof parsed !== 'object' || parsed === null) return null;
+
+        const context = parsed as Record<string, unknown>;
+        if (context.reference !== reference || typeof context.experienceId !== 'string') return null;
+        return context.experienceId;
+    } catch {
+        return null;
+    }
+}
+
+export function clearPendingPaystackContext(reference: string): void {
+    if (getPendingPaystackExperienceId(reference)) {
+        window.sessionStorage.removeItem(PENDING_PAYSTACK_CONTEXT_KEY);
+    }
 }
 
 export async function verifyPaystackCallback(reference: string): Promise<PaystackVerification> {
