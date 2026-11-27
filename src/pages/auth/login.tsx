@@ -24,7 +24,7 @@ export default function Login() {
     const navigate = useNavigate();
     const location = useLocation();
     const authStatus = useAuth((state) => state.status);
-    const destination = (location.state as LoginLocationState | null)?.from?.pathname || '/form';
+    const destination = (location.state as LoginLocationState | null)?.from?.pathname || '/dashboard';
     const [isExistingUser, setIsExistingUser] = useState(
         () => new URLSearchParams(location.search).get('mode') === 'login'
     );
@@ -40,7 +40,7 @@ export default function Login() {
     const isPending = loginPending || registerPending || recoveryPending || authStatus === 'checking';
 
     if (authStatus === 'authenticated') {
-        return <Navigate to="/form" replace />;
+        return <Navigate to={destination} replace />;
     }
 
     const validate = () => {
