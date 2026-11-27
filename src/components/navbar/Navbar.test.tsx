@@ -16,7 +16,7 @@ beforeEach(() => {
   useAuth.getState().setUnauthenticated();
 });
 
-test('links pricing, contact, sign-in, and closes the accessible mobile menu on selection', () => {
+test('links pricing, contact, sign-up, and log-in and closes the accessible mobile menu on selection', () => {
   render(<Navbar />);
 
   const toggle = screen.getByRole('button', { name: 'Open navigation menu' });
@@ -27,7 +27,8 @@ test('links pricing, contact, sign-in, and closes the accessible mobile menu on 
   expect(screen.getByRole('button', { name: 'Close navigation menu' })).toHaveAttribute('aria-expanded', 'true');
   expect(screen.getByRole('link', { name: 'Pricing' })).toHaveAttribute('href', '/pricing');
   expect(screen.getByRole('link', { name: 'Contact Us' })).toHaveAttribute('href', '/contact');
-  expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/login');
+  expect(screen.getByRole('link', { name: 'Sign up' })).toHaveAttribute('href', '/login?mode=signup');
+  expect(screen.getByRole('link', { name: 'Log in' })).toHaveAttribute('href', '/login?mode=login');
 
   fireEvent.click(screen.getByRole('link', { name: 'Contact Us' }));
   expect(screen.getByRole('button', { name: 'Open navigation menu' })).toHaveAttribute('aria-expanded', 'false');
@@ -43,7 +44,8 @@ test('keeps the authenticated user icon as the dashboard entry instead of adding
 
   render(<Navbar />);
 
-  expect(screen.queryByRole('link', { name: 'Sign in' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('link', { name: 'Sign up' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('link', { name: 'Log in' })).not.toBeInTheDocument();
   expect(screen.queryByRole('link', { name: 'Dashboard' })).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Open your dashboard' }));
   expect(mockNavigate).toHaveBeenCalledWith('/dashboard');

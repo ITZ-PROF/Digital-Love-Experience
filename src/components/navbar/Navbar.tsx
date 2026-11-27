@@ -71,7 +71,10 @@ function Navbar({ variant = 'light' }: NavbarProps) {
         <Link to="/pricing" className="navbar-link" onClick={closeMenu}>Pricing</Link>
         <Link to="/contact" className="navbar-link" onClick={closeMenu}>Contact Us</Link>
         {!authenticated && authStatus === 'unauthenticated' && (
-          <Link to="/login" className="navbar-link" onClick={closeMenu}>Sign in</Link>
+          <>
+            <Link to="/login?mode=signup" className="navbar-link" onClick={closeMenu}>Sign up</Link>
+            <Link to="/login?mode=login" className="navbar-link" onClick={closeMenu}>Log in</Link>
+          </>
         )}
         <button className="btn-primary" onClick={handleClick}>Create Experience</button>
 
