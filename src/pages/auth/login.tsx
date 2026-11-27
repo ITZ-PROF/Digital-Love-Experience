@@ -25,7 +25,9 @@ export default function Login() {
     const location = useLocation();
     const authStatus = useAuth((state) => state.status);
     const destination = (location.state as LoginLocationState | null)?.from?.pathname || '/form';
-    const [isExistingUser, setIsExistingUser] = useState(false);
+    const [isExistingUser, setIsExistingUser] = useState(
+        () => new URLSearchParams(location.search).get('mode') === 'login'
+    );
     const [isResetting, setIsResetting] = useState(false);
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');

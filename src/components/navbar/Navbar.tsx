@@ -1,7 +1,7 @@
-import {useNavigate, Link} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.svg';
 import profileLogo from '../../assets/profileLogo.svg';
-import { useState, useEffect,  } from 'react';
+import { useState, useEffect } from 'react';
 import './navbar.css';
 import { useAuth } from '../../stores/authstore';
 
@@ -11,9 +11,10 @@ interface NavbarProps {
 
 function Navbar({ variant = 'light' }: NavbarProps) {
 
-  const authenticated = useAuth((state) => state.status === 'authenticated');
+  const authStatus = useAuth((state) => state.status);
+  const authenticated = authStatus === 'authenticated';
   const [isMobile, setIsMobile] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // Controls mobile dropdown visibility
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,45 +32,63 @@ function Navbar({ variant = 'light' }: NavbarProps) {
   }, []);
 
   const handleClick = () => {
+    setIsMenuOpen(false);
     navigate('/form');
   };
 
-  return (
-    <nav className={`navbar navbar-${variant}`}>
-      <div className="navbar-logo">
-        <img src={logo} alt="Logo" className="navbar-logo-image" />
-        <h1 className="navbar-logo-text">DLE</h1>
-      </div>
+  const closeMenu = () => setIsMenuOpen(false);
 
-      {/* Hamburger menu button for small screens */}
+  return (
+    <nav className={`navbar navbar-${variant}`} aria-label="Main navigation">
+      <Link to="/" className="navbar-logo" aria-label="Digital Love Experience home" onClick={closeMenu}>
+        <img src={logo} alt="" className="navbar-logo-image" />
+        <span className="navbar-logo-text">DLE</span>
+      </Link>
+
       {isMobile && (
-        <button 
-          className={`navbar-toggle ${isMenuOpen ? 'open' : ''}`} 
+        <button
+          type="button"
+          id="navbar-menu-toggle"
+          className={`navbar-toggle ${isMenuOpen ? 'open' : ''}`}
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle Navigation Menu"
+          aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={isMenuOpen}
+          aria-controls="navbar-links"
         >
-          <span className="hamburger-bar"></span>
-          <span className="hamburger-bar"></span>
-          <span className="hamburger-bar"></span>
+          <span className="hamburger-bar" aria-hidden="true"></span>
+          <span className="hamburger-bar" aria-hidden="true"></span>
+          <span className="hamburger-bar" aria-hidden="true"></span>
         </button>
       )}
 
-      {/* Nav links container: conditionally hides or slides down */}
-      <div className={`navbar-links ${isMobile ? 'mobile-menu' : ''} ${isMenuOpen ? 'show' : ''}`}>
-        <Link to="/" className="navbar-link">Home</Link>
-        <Link to="/birthday" className="navbar-link">Samples</Link>
-        <Link to="/form" className="navbar-link">Pricing</Link>
-        <Link to="/form" className="navbar-link">Contact Us</Link>
+      <div
+        id="navbar-links"
+        className={`navbar-links ${isMobile ? 'mobile-menu' : ''} ${isMenuOpen ? 'show' : ''}`}
+        aria-labelledby={isMobile ? 'navbar-menu-toggle' : undefined}
+      >
+        <Link to="/" className="navbar-link" onClick={closeMenu}>Home</Link>
+        <Link to="/birthday" className="navbar-link" onClick={closeMenu}>Samples</Link>
+        <Link to="/pricing" className="navbar-link" onClick={closeMenu}>Pricing</Link>
+        <Link to="/contact" className="navbar-link" onClick={closeMenu}>Contact Us</Link>
+        {!authenticated && authStatus === 'unauthenticated' && (
+          <>
+            <Link to="/login?mode=signup" className="navbar-link" onClick={closeMenu}>Sign up</Link>
+            <Link to="/login?mode=login" className="navbar-link" onClick={closeMenu}>Log in</Link>
+          </>
+        )}
         <button className="btn-primary" onClick={handleClick}>Create Experience</button>
-        
+
         {authenticated && (
           <button
             type="button"
             className="navbar-profile"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => {
+              closeMenu();
+              navigate('/dashboard');
+            }}
             aria-label="Open your dashboard"
           >
-            <img src={profileLogo} alt="Profile" className="navbar-profile-image" />
+            <img src={profileLogo} alt="" className="navbar-profile-image" />
           </button>
         )}
       </div>
