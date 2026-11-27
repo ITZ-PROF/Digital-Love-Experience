@@ -3,6 +3,7 @@ import x from '../../assets/x.svg';
 import ig from '../../assets/ig.svg';
 import fb from '../../assets/fb.svg';
 import logo_variant_1 from '../../assets/logo_variant_1.svg';
+import { Link } from 'react-router-dom';
 
 function Footer(){
     return(
@@ -16,7 +17,7 @@ function Footer(){
                 <ul className='upper-footer-section-mid-list'>
                     <li className='list-header'>Products</li>
                     <li><a href='/'>Features</a></li>
-                    <li><a href='/'>Pricing</a></li>
+                    <li><Link to='/pricing'>Pricing</Link></li>
                     <li><a href='/'>Templates</a></li>
                     <li><a href='/'>Examples</a></li>
                 </ul>
@@ -24,6 +25,7 @@ function Footer(){
             <div className='upper-footer-section-end'> 
                 <ul className='upper-footer-section-end-list'>
                     <li className='list-header'>Support</li>
+                    <li><Link to='/contact'>Contact Us</Link></li>
                     <li><a href='/'>Privacy Center</a></li>
                     <li><a href='/'>Privacy Policy</a></li>
                 </ul>

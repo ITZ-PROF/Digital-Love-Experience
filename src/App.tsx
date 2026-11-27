@@ -13,6 +13,7 @@ import Dashboard from './pages/dashboard/Dashboard';
 import ExperiencePreview from './pages/dashboard/ExperiencePreview';
 import SharedExperiencePage from './pages/share/SharedExperience';
 import PaymentCallback from './pages/payment/PaymentCallback';
+import { ContactPage, PricingPage } from './pages/marketing/MarketingPages';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import axios from 'axios';
 import { getCurrentUser } from './services/auth.service';
@@ -100,6 +101,8 @@ function Applive() {
           />
           <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
           <Route path="/payment/callback" element={<PaymentCallback />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route
             path="/experiences/:id/preview"
             element={<RequireAuth><ExperiencePreview /></RequireAuth>}
